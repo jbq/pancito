@@ -1,0 +1,134 @@
+<html>
+
+<head>
+<style type="text/css">
+body {
+font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+color: white;
+background: #111111 url(http://3.bp.blogspot.com/-g9tyFyMbiHY/T6KwI7gX0VI/AAAAAAAAE_w/pGWBQwVYrrk/s1600/pancito.JPG) repeat scroll top left;
+margin-left: 25%;
+margin-right: 25%;
+}
+
+h1, h2 {
+font-weight: normal;
+}
+
+table.order {
+	width: 100%;
+border-collapse: separate;
+border-spacing: 0
+}
+
+table.order td {
+border-bottom: 1px solid #AAAAAA;
+padding: 1em;
+}
+
+table.order td.submit {
+background-color: #DFDFDF;
+}
+
+table.poll {
+border-collapse: separate;
+border-spacing: 0
+}
+table.poll tr td {
+border-bottom: 1px solid white;
+border-bottom-width: 1px;
+border-bottom-style: solid;
+border-bottom-color: white;
+padding: 6px;
+}
+table.poll tr td.n {
+background-color: #FFCCCA;
+}
+table.poll tr td.y {
+background-color: #D1F3D1;
+}
+table.poll tr td.p {
+background-color: #B2D1F9;
+}
+
+table.poll tr td.pname {
+background-color: #EFEFEF;
+}
+
+table.poll tr td.d {
+background-color: #3385E4;
+color: white;
+}
+.info, .success, .warning, .error {
+border: 1px solid;
+margin: 10px 0px;
+padding:15px 10px 15px 50px;
+background-repeat: no-repeat;
+background-position: 10px center;
+}
+.info {
+color: #00529B;
+background-color: #BDE5F8;
+background-image: url('knobs/Knob%20Info.png');
+}
+.success {
+color: #4F8A10;
+background-color: #DFF2BF;
+background-image:url('knobs/Knob%20Valid%20Green.png');
+}
+.warning {
+color: #9F6000;
+background-color: #FEEFB3;
+background-image: url('knobs/Knob%20Attention.png');
+}
+.error {
+color: #D8000C;
+background-color: #FFBABA;
+background-image: url('knobs/Knob%20Cancel.png');
+}
+
+.main {
+    color: #333333;
+    background-color: #DFDFDF;
+}
+
+.main h2 {
+    padding: .5em;
+    padding-bottom: 0;
+}
+
+.content {
+    border-top: 1px solid #AAAAAA;
+    background-color: white;
+    color: black;
+}
+
+.content td {
+    background-color: white;
+    color: black;
+}
+</style>
+</head>
+
+<body>
+<h1 class='title'>
+Pancito
+</h1>
+
+#if $success
+<div class="success">
+$success
+</div>
+#end if
+
+#if $error
+<div class="error">
+$error
+</div>
+#end if
+
+#block content
+
+#end block
+</body>
+
+</html>

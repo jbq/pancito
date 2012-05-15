@@ -1,0 +1,44 @@
+#encoding utf-8
+#import base
+#extends base.base
+
+#def content
+#if $params.getfirst('admin')
+<h1>Commandes de ${user.name}</h1>
+#elif not($success)
+<p class="info">Pour chaque fournée ci-dessous, veuillez renseigner le nombre de pains que vous souhaitez réserver</p>
+#end if
+
+<form method="POST">
+#for $bake in $bakes
+<div class="main">
+<h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
+<div class="content">
+<table class="order">
+#for $product in $products
+<tr>
+<td>
+<i>
+$product.name
+</i>
+</td>
+<td>
+#set $orders = $bake.orders.get($user.rowid) or {}
+Quantité:&nbsp;
+<input type="text" name="bake.${bake.rowid}.${product.rowid}" value="${$orders.get($product.rowid) or 0}">
+</td>
+</tr>
+#end for
+<tr>
+<td class="submit" colspan=2>
+<div style="text-align: right">
+<input type="submit" value="Enregistrer">
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+#end for
+</form>
+#end def

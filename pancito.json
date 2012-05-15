@@ -1,0 +1,9 @@
+{
+    "uwsgi": {
+	"plugins": ["python"],
+	"buffer-size": 25000,
+	"module": "pancito:application",
+	"http-socket": ":8080",
+	"pythonpath": [".", "templates"]
+    }
+}

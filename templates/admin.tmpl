@@ -1,0 +1,45 @@
+#import base
+#extends base.base
+
+#def content
+<div class="main">
+<h2>Admin</h2>
+
+<div class="content">
+<table class="poll">
+<thead>
+<tr>
+<td></td>
+#for $bake in $bakes
+<td class="d">$bake.bakedate
+</td>
+#end for
+<td></td>
+</tr>
+</thead>
+<tbody>
+#for $user in $users
+<tr>
+<td class="pname">
+$user.name
+</td>
+#for $bake in $bakes
+#set $orders = $bake.orders.get($user.rowid)
+#if $orders
+<td class="y">
+$orders.get(1) + $orders.get(2)
+</td>
+#else
+<td class="n"></td>
+#end if
+#end for
+<td>
+<a href="/order?userId=${user.rowid}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
+</td>
+</tr>
+#end for
+</tbody>
+</table>
+</div>
+</div>
+#end def

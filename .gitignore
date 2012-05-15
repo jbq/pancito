@@ -1,0 +1,6 @@
+data
+.sw*
+.*.sw*
+templates/*.py*
+secret
+pancito/*.pyc

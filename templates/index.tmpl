@@ -1,0 +1,112 @@
+<html>
+
+<head>
+<style type="text/css">
+body {
+font-family: sans-serif;
+}
+table.poll {
+border-collapse: separate;
+border-spacing: 0
+}
+table.poll tr td {
+border-bottom: 1px solid white;
+border-bottom-width: 1px;
+border-bottom-style: solid;
+border-bottom-color: white;
+background-color: #EFEFEF;
+padding: 6px;
+}
+table.poll tr td.y {
+background-color: #D1F3D1;
+}
+table.poll tr td.p {
+background-color: #B2D1F9;
+}
+
+table.poll tr td.d {
+background-color: #3385E4;
+color: white;
+}
+.info, .success, .warning, .error, .validation {
+border: 1px solid;
+margin: 10px 0px;
+padding:15px 10px 15px 50px;
+background-repeat: no-repeat;
+background-position: 10px center;
+}
+.info {
+color: #00529B;
+background-color: #BDE5F8;
+/*background-image: url('info.png');*/
+}
+.success {
+color: #4F8A10;
+background-color: #DFF2BF;
+/*background-image:url('success.png');*/
+}
+.warning {
+color: #9F6000;
+background-color: #FEEFB3;
+/*background-image: url('warning.png');*/
+}
+.error {
+color: #D8000C;
+background-color: #FFBABA;
+/*background-image: url('error.png');*/
+}
+</style>
+</head>
+
+<body>
+<h1>Pancito</h1>
+<h2>Bon de commande</h2>
+
+#if $error
+<div class="error">
+$error
+</div>
+#end if
+
+<form method="POST">
+<table class="poll">
+<thead>
+<tr>
+<td></td>
+#for $bake in $bakes
+<td class="d">$bake.bakedate</td>
+#end for
+</tr>
+</thead>
+<tbody>
+#for $user in $users
+<tr>
+<td class="pname">
+$user.name
+</td>
+#for $bake in $bakes
+<td></td>
+#end for
+</tr>
+#end for
+<tr>
+<td class="p">
+<p>Votre nom: <input type='text' name='name' value="$params.getfirst('name')">
+<p>Votre email: <input type='text' name='email' value="$params.getfirst('email')">
+</td>
+#for $bake in $bakes
+<td class="p"><input type="checkbox" name="bake.${bake.rowid}"></td>
+#end for
+</tr>
+<tr>
+<td colspan=${len($bakes) + 1}>
+<div style="text-align: right">
+<input type="submit" value="Enregistrer">
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</form>
+</body>
+</html>
