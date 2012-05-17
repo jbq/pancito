@@ -43,7 +43,7 @@ def genToken(user):
     s.update(user['email'])
     s.update(secretKey)
 
-    return s.hexdigest()
+    return s.hexdigest()[:7]
 
 def verifyToken(user, token):
     if token is None:
