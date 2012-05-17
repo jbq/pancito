@@ -242,7 +242,8 @@ class App:
             return unicode(template).encode('utf-8')
 
         if uri.startswith("/knobs/"):
-            with open(os.path.join("knobs", os.path.basename(uri))) as f:
+            knobsDir = os.path.join(root, "knobs")
+            with open(os.path.join(knobsDir, os.path.basename(uri))) as f:
                 self.addHeader("Content-Type", "image/png")
                 return f.read()
 
