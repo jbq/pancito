@@ -1,0 +1,5 @@
+Getting started
+
+* Create "data" directory to hold the database
+* If you want to reuse an existing "pancito.db" database, move it to this folder
+* Compile the base cheetah template: cheetah compile templates/base.tmpl
