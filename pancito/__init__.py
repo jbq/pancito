@@ -28,7 +28,8 @@ createTableOrder = '''CREATE TABLE bakeorder (
 import locale
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
-with open("secret") as f:
+root = os.path.dirname(os.path.dirname(__file__))
+with open(os.path.join(root, "secret")) as f:
     secretKey = f.read().rstrip()
 
 
@@ -52,8 +53,7 @@ class BadRequest(Exception):
 
 class App:
     def __init__(self, environ, start_response):
-        self.root = os.path.dirname(os.path.dirname(__file__))
-        self.datadir = os.path.join(self.root, 'data')
+        self.datadir = os.path.join(root, 'data')
         self.environ = environ
         self._startResponse = start_response
         self.status = "200 OK"
@@ -104,7 +104,7 @@ class App:
             c.execute(createTableOrder)
 
     def getTemplate(self, t):
-        template = Cheetah.Template.Template(file=os.path.join(self.root, "templates/%s.tmpl" % t))
+        template = Cheetah.Template.Template(file=os.path.join(root, "templates/%s.tmpl" % t))
         template.error = None
         template.success = None
         template.genToken = genToken
