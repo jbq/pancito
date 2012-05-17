@@ -6,15 +6,18 @@ import sqlite3, hashlib
 createTableUser = '''
 CREATE TABLE user (
     name text unique not null,
-    email text unique not null
+    email text unique not null,
+    creation_time datetime not null default current_timestamp
 )'''
 
 createTableBake = '''CREATE TABLE bake (
-    bakedate date unique not null
+    bakedate date unique not null,
+    creation_time datetime not null default current_timestamp
 )'''
 
 createTableProduct = '''CREATE TABLE product (
-    name text
+    name text,
+    creation_time datetime not null default current_timestamp
 )'''
 
 createTableOrder = '''CREATE TABLE bakeorder (
@@ -22,6 +25,7 @@ createTableOrder = '''CREATE TABLE bakeorder (
     userid int not null,
     productid int not null,
     quantity int not null default 0,
+    creation_time datetime not null default current_timestamp,
     unique(bakeid, userid, productid)
 )'''
 
