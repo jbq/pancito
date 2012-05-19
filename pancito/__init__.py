@@ -33,9 +33,29 @@ import locale
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
 root = os.path.dirname(os.path.dirname(__file__))
+datadir = os.path.join(root, 'data')
 with open(os.path.join(root, "secret")) as f:
     secretKey = f.read().rstrip()
 
+def opendb():
+    dbpath = os.path.join(datadir, 'pancito.db')
+
+    if not(os.path.exists(dbpath)):
+        newDB = True
+    else:
+        newDB = False
+
+    conn = sqlite3.connect(dbpath)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    if newDB:
+        c.execute(createTableUser)
+        c.execute(createTableBake)
+        c.execute(createTableProduct)
+        c.execute(createTableOrder)
+
+    return conn
 
 def genToken(user):
     s = hashlib.sha1()
@@ -57,7 +77,6 @@ class BadRequest(Exception):
 
 class App:
     def __init__(self, environ, start_response):
-        self.datadir = os.path.join(root, 'data')
         self.environ = environ
         self._startResponse = start_response
         self.status = "200 OK"
@@ -88,24 +107,6 @@ class App:
             self.__params = cgi.FieldStorage(fp, environ=self.environ)
 
         return self.__params
-
-    def opendb(self):
-        dbpath = os.path.join(self.datadir, 'pancito.db')
-
-        if not(os.path.exists(dbpath)):
-            newDB = True
-        else:
-            newDB = False
-
-        self.conn = sqlite3.connect(dbpath)
-        self.conn.row_factory = sqlite3.Row
-        c = self.conn.cursor()
-
-        if newDB:
-            c.execute(createTableUser)
-            c.execute(createTableBake)
-            c.execute(createTableProduct)
-            c.execute(createTableOrder)
 
     def getTemplate(self, t):
         template = Cheetah.Template.Template(file=os.path.join(root, "templates/%s.tmpl" % t))
@@ -196,7 +197,7 @@ class App:
             return unicode(template).encode('utf-8')
 
         if uri == "/admin/%s" % secretKey:
-            self.opendb()
+            self.conn = opendb()
             template=self.getTemplate("admin")
             template.bakes = list(self.buildBakesWithOrdersByUser(list(self.getBakes())))
 
@@ -213,7 +214,8 @@ class App:
                 userId = int(params.getfirst("userId"))
             except:
                 raise BadRequest("No user id specified")
-            self.opendb()
+
+            self.conn = opendb()
             template.user = self.getUser(userId)
             if template.user is None:
                 raise BadRequest("No such user")
