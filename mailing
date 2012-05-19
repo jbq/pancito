@@ -1,14 +1,20 @@
 #! /usr/bin/python
 import os.path
 import pancito
+import Cheetah.Template
+import email.header
+
+def encodeHeader(v):
+    return email.header.Header(v, 'utf-8').encode()
 
 def writeMail(user):
     with open(os.path.join(pancito.datadir, "mail", str(user['rowid'])), "w") as f:
-        content = mailTemplate % {'url': 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user)), 'email': user['email']}
+        t = Cheetah.Template.Template(file=os.path.join(pancito.datadir, "mail.tmpl"))
+        t.url = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
+        t.email = user['email']
+        t.encodeHeader = encodeHeader
+        content = unicode(t)
         f.write(content.encode('utf-8'))
-
-with open(os.path.join(pancito.datadir, "mail.tmpl")) as f:
-    mailTemplate = f.read().decode('utf-8')
 
 conn = pancito.opendb()
 c = conn.cursor()
