@@ -2,6 +2,7 @@
 import os.path, StringIO, sys, operator, datetime, cgi
 import Cheetah.Template
 import sqlite3, hashlib
+import pytz
 
 createTableUser = '''
 CREATE TABLE user (
@@ -120,6 +121,13 @@ class App:
     def getBakeOrdersByUserId(self, bakeId):
         return self.getBakeOrdersByField(bakeId, "userid", "productid")
 
+    def displayOrder(self, order):
+        order = dict(order)
+        ct = datetime.datetime.strptime(order['creation_time'], "%Y-%m-%d %H:%M:%S")
+        ct = ct.replace(tzinfo=pytz.timezone('UTC'))
+        order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
+        return order
+
     def getBakeOrdersByField(self, bakeId, field, subfield):
         assert isinstance(bakeId, (int, long)), "Expecting %s for bakeId, got %s" % (int, type(bakeId))
         c = self.conn.cursor()
@@ -127,10 +135,9 @@ class App:
         ordersByField = {}
         for order in c.fetchall():
             try:
-                ordersByField[order[field]][order[subfield]] = order['quantity']
+                ordersByField[order[field]][order[subfield]] = self.displayOrder(order)
             except KeyError:
-                ordersByField[order[field]] = {order[subfield]: order['quantity']}
-
+                ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
         return ordersByField
 
     def buildBakesWithOrdersByUser(self, bakes):
@@ -228,6 +235,8 @@ class App:
                 # admin displays all dates
                 bakes = list(self.getBakes())
 
+            template.bakes = list(self.buildBakesWithOrdersByUser(bakes))
+
             if method == "POST":
                 c = self.conn.cursor()
 
@@ -243,7 +252,6 @@ class App:
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
 
-            template.bakes = list(self.buildBakesWithOrdersByUser(bakes))
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')
 

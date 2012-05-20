@@ -11,11 +11,16 @@
 
 <form method="POST">
 #for $bake in $bakes
+#set $orders = $bake.orders.get($user.rowid) or {}
 <div class="main">
 <h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
 <div class="content">
+#if $bake.orders.get($user.rowid)
+<div class="warning" style="margin: .5em">Cette commande a déjà enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y") à $orders.get(1).creation_time.strftime("%Hh%M")</div>
+#end if
 <table class="order">
 #for $product in $products
+#set $order = $orders.get($product.rowid)
 <tr>
 <td>
 <i>
@@ -23,9 +28,13 @@ $product.name
 </i>
 </td>
 <td>
-#set $orders = $bake.orders.get($user.rowid) or {}
 Quantité:&nbsp;
-<input type="text" name="bake.${bake.rowid}.${product.rowid}" value="${$orders.get($product.rowid) or 0}">
+#if $order
+#set $qty = $order.quantity
+#else
+#set $qty = 0
+#end if
+<input type="text" name="bake.${bake.rowid}.${product.rowid}" value="$qty">
 </td>
 </tr>
 #end for
