@@ -8,7 +8,7 @@ def encodeHeader(v):
     return email.header.Header(v, 'utf-8').encode()
 
 def writeMail(user):
-    with open(os.path.join(pancito.datadir, "mail", str(user['rowid'])), "w") as f:
+    with open(os.path.join(pancito.datadir, "mail", "%02u" % user['rowid']), "w") as f:
         t = Cheetah.Template.Template(file=os.path.join(pancito.datadir, "mail.tmpl"))
         t.url = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
         t.email = user['email']
