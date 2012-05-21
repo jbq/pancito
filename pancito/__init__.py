@@ -235,9 +235,12 @@ class App:
                 # admin displays all dates
                 bakes = list(self.getBakes())
 
-            template.bakes = list(self.buildBakesWithOrdersByUser(bakes))
-
-            if method == "POST":
+            initialBakes = None
+            if method == "GET":
+                initialBakes = list(self.buildBakesWithOrdersByUser(bakes))
+            elif method == "POST":
+                # Don't display existing order warning when we do a POST
+                initialBakes = None
                 c = self.conn.cursor()
 
                 for bake in bakes:
@@ -251,6 +254,13 @@ class App:
 
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
+
+            template.bakes = list(self.buildBakesWithOrdersByUser(bakes))
+            for i, bake in enumerate(template.bakes):
+                if initialBakes is not None:
+                    bake['initialOrders'] = initialBakes[i]['orders']
+                else:
+                    bake['initialOrders'] = {}
 
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')

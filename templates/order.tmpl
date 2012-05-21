@@ -15,7 +15,7 @@
 <div class="main">
 <h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
 <div class="content">
-#if $bake.orders.get($user.rowid)
+#if $bake.initialOrders.get($user.rowid)
 <div class="warning" style="margin: .5em">Cette commande a déjà enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y") à $orders.get(1).creation_time.strftime("%Hh%M")</div>
 #end if
 <table class="order">
