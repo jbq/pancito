@@ -25,12 +25,14 @@ $user.name
 </td>
 #for $bake in $bakes
 #set $orders = $bake.orders.get($user.rowid)
-#if $orders
+#if $orders and sum([$x.quantity for x in $orders.values()]) > 0
 <td class="y">
-$orders.get(1) + $orders.get(2)
+$orders.get(1).quantity + $orders.get(2).quantity
 </td>
-#else
+#elif $orders
 <td class="n"></td>
+#else
+<td class="na"></td>
 #end if
 #end for
 <td>
@@ -39,6 +41,30 @@ $orders.get(1) + $orders.get(2)
 </tr>
 #end for
 </tbody>
+<tfoot>
+<tr>
+<td>&nbsp;</td>
+#for $bake in $bakes
+<td>
+$sum([$orders.get(1).quantity for $orders in $bake.orders.values()])
++
+$sum([$orders.get(2).quantity for $orders in $bake.orders.values()])
+</td>
+#end for
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+#for $bake in $bakes
+<td>
+${sum([$orders.get(1).quantity for $orders in $bake.orders.values()]) * 0.875
++
+sum([$orders.get(2).quantity for $orders in $bake.orders.values()]) * 1.75}
+</td>
+#end for
+<td>&nbsp;</td>
+</tr>
+</tfoot>
 </table>
 </div>
 </div>
