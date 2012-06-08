@@ -120,15 +120,16 @@ class DBManager(object):
         c.execute("SELECT rowid, * from user")
         return c.fetchall()
 
-    def deleteBakeOrders(user_id, bake_id):
+    def deleteBakeOrders(self, user_id, bake_id):
         assert isinstance(user_id, int)
         assert isinstance(bake_id, int)
         c = self.conn.cursor()
-        c.execute("DELETE FROM bakeorder WHERE userid = ? AND bakeid = ?", (userId, bake_id))
+        c.execute("DELETE FROM bakeorder WHERE userid = ? AND bakeid = ?", (user_id, bake_id))
 
-    def addBakeOrder(user_id, bake_id, product_id, qty):
+    def addBakeOrder(self, user_id, bake_id, product_id, qty):
         assert isinstance(user_id, int)
         assert isinstance(bake_id, int)
         assert isinstance(product_id, int)
         assert isinstance(qty, int)
+        c = self.conn.cursor()
         c.execute("INSERT INTO bakeorder (userid, bakeid, productid, quantity) VALUES (?, ?, ?, ?)", (user_id, bake_id, product_id, qty))
