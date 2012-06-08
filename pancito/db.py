@@ -6,8 +6,8 @@ createTables = [
 CREATE TABLE user (
     name text unique not null,
     email text unique not null,
-    ismember boolean not null default false,
-    ismailing boolean not null default true,
+    ismember boolean not null default 0,
+    ismailing boolean not null default 1,
     creation_time datetime not null default current_timestamp,
     unsubscribe_time datetime
 )''',
