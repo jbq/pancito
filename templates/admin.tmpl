@@ -7,64 +7,64 @@
 
 <div class="content">
 <table class="poll">
-<thead>
-<tr>
-<td></td>
-#for $bake in $bakes
-<td class="d">$bake.bakedate
-</td>
-#end for
-<td></td>
-</tr>
-</thead>
-<tbody>
-#for $user in $users
-<tr>
-<td class="pname">
-$user.name
-</td>
-#for $bake in $bakes
-#set $orders = $bake.orders.get($user.rowid)
-#if $orders and sum([$x.quantity for x in $orders.values()]) > 0
-<td class="y">
-$orders.get(1).quantity + $orders.get(2).quantity
-</td>
-#elif $orders
-<td class="n"></td>
-#else
-<td class="na"></td>
-#end if
-#end for
-<td>
-<a href="/order?userId=${user.rowid}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
-</td>
-</tr>
-#end for
-</tbody>
-<tfoot>
-<tr>
-<td>&nbsp;</td>
-#for $bake in $bakes
-<td>
-$sum([$orders.get(1).quantity for $orders in $bake.orders.values()])
-+
-$sum([$orders.get(2).quantity for $orders in $bake.orders.values()])
-</td>
-#end for
-<td>&nbsp;</td>
-</tr>
-<tr>
-<td>&nbsp;</td>
-#for $bake in $bakes
-<td>
-${sum([$orders.get(1).quantity for $orders in $bake.orders.values()]) * 0.875
-+
-sum([$orders.get(2).quantity for $orders in $bake.orders.values()]) * 1.75}
-</td>
-#end for
-<td>&nbsp;</td>
-</tr>
-</tfoot>
+	<thead>
+		<tr>
+			<td></td>
+			#for $bake in $bakes
+			<td class="d">$bake.bakedate
+			</td>
+			#end for
+			<td></td>
+		</tr>
+	</thead>
+	<tbody>
+		#for $user in $users
+		<tr>
+			<td class="pname member-$user.ismember">
+			$user.name
+			</td>
+			#for $bake in $bakes
+			#set $orders = $bake.orders.get($user.rowid)
+			#if $orders and sum([$x.quantity for x in $orders.values()]) > 0
+			<td class="y">
+			$orders.get(1).quantity + $orders.get(2).quantity
+			</td>
+			#elif $orders
+			<td class="n"></td>
+			#else
+			<td class="na"></td>
+			#end if
+			#end for
+			<td>
+			<a href="/order?userId=${user.rowid}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
+			</td>
+		</tr>
+		#end for
+	</tbody>
+	<tfoot>
+		<tr>
+			<td>&nbsp;</td>
+			#for $bake in $bakes
+			<td>
+			$sum([$orders.get(1).quantity for $orders in $bake.orders.values()])
+			+
+			$sum([$orders.get(2).quantity for $orders in $bake.orders.values()])
+			</td>
+			#end for
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			#for $bake in $bakes
+			<td>
+			${sum([$orders.get(1).quantity for $orders in $bake.orders.values()]) * 0.875
+			+
+			sum([$orders.get(2).quantity for $orders in $bake.orders.values()]) * 1.75}
+			</td>
+			#end for
+			<td>&nbsp;</td>
+		</tr>
+	</tfoot>
 </table>
 </div>
 </div>
