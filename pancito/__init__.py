@@ -88,6 +88,7 @@ class App(db.DBManager):
         template.success = None
         template.warning = None
         template.genToken = genToken
+        template.today = datetime.date.today()
         params = self.getQueryParameters()
         template.params = params
         return template
@@ -142,7 +143,7 @@ class App(db.DBManager):
         if uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
-            template.bakes = list(self.buildBakesWithOrdersByUser(list(self.getBakes())))
+            template.bakes = list(self.buildBakesWithOrdersByUser())
 
             template.users = self.getUsers()
             self.addHeader("Content-Type", "text/html")
@@ -178,19 +179,16 @@ class App(db.DBManager):
             verifyToken(template.user, params.getfirst('t'))
 
             template.products = self.getProducts()
-            bakes = list(self.getBakesForIds(params.getlist('b')))
-            if len(bakes) == 0:
-                # admin displays all dates
-                bakes = list(self.getBakes())
+            editedBakes = list(self.getBakesForIds(params.getlist('b')))
 
             initialBakes = None
             if method == "GET":
-                initialBakes = list(self.buildBakesWithOrdersByUser(bakes))
+                initialBakes = list(self.buildBakesWithOrdersByUser())
             elif method == "POST":
                 # Don't display existing order warning when we do a POST
                 initialBakes = None
 
-                for bake in bakes:
+                for bake in editedBakes:
                     self.deleteBakeOrders(userId, bake['rowid'])
                     for product in template.products:
                         try:
@@ -202,7 +200,7 @@ class App(db.DBManager):
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
 
-            template.bakes = list(self.buildBakesWithOrdersByUser(bakes))
+            template.bakes = list(self.buildBakesWithOrdersByUser())
             for i, bake in enumerate(template.bakes):
                 if initialBakes is not None:
                     bake['initialOrders'] = initialBakes[i]['orders']

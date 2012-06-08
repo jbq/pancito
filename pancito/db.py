@@ -64,25 +64,26 @@ class DBManager(object):
                 ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
         return ordersByField
 
-    def buildBakesWithOrdersByUser(self, bakes):
-        for bake in bakes:
-            b = dict(bake)
-            b["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
-            yield b
+    def buildBakesWithOrdersByUser(self):
+        for bake in self.getBakes():
+            bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
+            yield bake
 
-    def buildBakesWithOrdersByProduct(self, bakes):
-        for bake in bakes:
-            b = dict(bake)
-            b["orders"] = self.getBakeOrdersByProductId(bake['rowid'])
-            yield b
+    def buildBakesWithOrdersByProduct(self):
+        for bake in self.getBakes():
+            bake["orders"] = self.getBakeOrdersByProductId(bake['rowid'])
+            yield bake
+
+    def toDisplayBake(self, row):
+        d = dict(row)
+        d['bakedate'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d").date()
+        return d
 
     def getBakes(self):
         c = self.conn.cursor()
         c.execute("SELECT rowid, * from bake")
         for row in c.fetchall():
-            d = dict(row)
-            d['bakedate'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
-            yield d
+            yield self.toDisplayBake(row)
 
     def getBakesForIds(self, bakeIds):
         c = self.conn.cursor()
@@ -90,7 +91,7 @@ class DBManager(object):
             c.execute("SELECT rowid, * from bake WHERE rowid = ?", (bakeId,))
             row = c.fetchone()
             if row is not None:
-                yield row
+                yield self.toDisplayBake(row)
 
     def getProducts(self):
         c = self.conn.cursor()
