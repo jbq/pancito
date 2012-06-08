@@ -3,32 +3,7 @@ import os.path, StringIO, sys, operator, datetime, cgi
 import Cheetah.Template
 import sqlite3, hashlib
 import pytz
-
-createTableUser = '''
-CREATE TABLE user (
-    name text unique not null,
-    email text unique not null,
-    creation_time datetime not null default current_timestamp
-)'''
-
-createTableBake = '''CREATE TABLE bake (
-    bakedate date unique not null,
-    creation_time datetime not null default current_timestamp
-)'''
-
-createTableProduct = '''CREATE TABLE product (
-    name text,
-    creation_time datetime not null default current_timestamp
-)'''
-
-createTableOrder = '''CREATE TABLE bakeorder (
-    bakeid int not null,
-    userid int not null,
-    productid int not null,
-    quantity int not null default 0,
-    creation_time datetime not null default current_timestamp,
-    unique(bakeid, userid, productid)
-)'''
+import db
 
 import locale
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
@@ -51,10 +26,8 @@ def opendb():
     c = conn.cursor()
 
     if newDB:
-        c.execute(createTableUser)
-        c.execute(createTableBake)
-        c.execute(createTableProduct)
-        c.execute(createTableOrder)
+        for createTable in db.createTables:
+            c.execute(createTable)
 
     return conn
 
@@ -76,7 +49,7 @@ def verifyToken(user, token):
 class BadRequest(Exception):
     pass
 
-class App:
+class App(db.DBManager):
     def __init__(self, environ, start_response):
         self.environ = environ
         self._startResponse = start_response
@@ -118,65 +91,12 @@ class App:
         template.params = params
         return template
 
-    def getBakeOrdersByUserId(self, bakeId):
-        return self.getBakeOrdersByField(bakeId, "userid", "productid")
-
     def displayOrder(self, order):
         order = dict(order)
         ct = datetime.datetime.strptime(order['creation_time'], "%Y-%m-%d %H:%M:%S")
         ct = ct.replace(tzinfo=pytz.timezone('UTC'))
         order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
         return order
-
-    def getBakeOrdersByField(self, bakeId, field, subfield):
-        assert isinstance(bakeId, (int, long)), "Expecting %s for bakeId, got %s" % (int, type(bakeId))
-        c = self.conn.cursor()
-        c.execute("SELECT rowid, * from bakeorder WHERE bakeid = ?", (bakeId,))
-        ordersByField = {}
-        for order in c.fetchall():
-            try:
-                ordersByField[order[field]][order[subfield]] = self.displayOrder(order)
-            except KeyError:
-                ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
-        return ordersByField
-
-    def buildBakesWithOrdersByUser(self, bakes):
-        for bake in bakes:
-            b = dict(bake)
-            b["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
-            yield b
-
-    def buildBakesWithOrdersByProduct(self, bakes):
-        for bake in bakes:
-            b = dict(bake)
-            b["orders"] = self.getBakeOrdersByProductId(bake['rowid'])
-            yield b
-
-    def getBakes(self):
-        c = self.conn.cursor()
-        c.execute("SELECT rowid, * from bake")
-        for row in c.fetchall():
-            d = dict(row)
-            d['bakedate'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
-            yield d
-
-    def getBakesForIds(self, bakeIds):
-        c = self.conn.cursor()
-        for bakeId in bakeIds:
-            c.execute("SELECT rowid, * from bake WHERE rowid = ?", (bakeId,))
-            row = c.fetchone()
-            if row is not None:
-                yield row
-
-    def getProducts(self):
-        c = self.conn.cursor()
-        c.execute("SELECT rowid, * from product")
-        return c.fetchall()
-
-    def getUser(self, userId):
-        c = self.conn.cursor()
-        c.execute("SELECT rowid, * from user WHERE rowid = ?", (userId,))
-        return c.fetchone()
 
     def processRequest(self):
         uri = self.environ['PATH_INFO']
@@ -196,9 +116,7 @@ class App:
 
             if template.error is None:
                 try:
-                    c.execute("INSERT INTO user (name, email) VALUES (?, ?)", (name, email))
-                    userid = c.lastrowid
-                    conn.commit()
+                    self.addUser(name, email)
                 except sqlite3.IntegrityError:
                     template.error = u"Cet utilisateur est déjà enregistré"
             return unicode(template).encode('utf-8')
@@ -208,9 +126,7 @@ class App:
             template=self.getTemplate("admin")
             template.bakes = list(self.buildBakesWithOrdersByUser(list(self.getBakes())))
 
-            c = self.conn.cursor()
-            c.execute("SELECT rowid, * from user")
-            template.users = c.fetchall()
+            template.users = self.getUsers()
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')
 
@@ -241,16 +157,15 @@ class App:
             elif method == "POST":
                 # Don't display existing order warning when we do a POST
                 initialBakes = None
-                c = self.conn.cursor()
 
                 for bake in bakes:
-                    c.execute("DELETE FROM bakeorder WHERE userid = ? AND bakeid = ?", (userId, bake['rowid']))
+                    self.deleteBakeOrders(userId, bake['rowid'])
                     for product in template.products:
                         try:
                             qty = int(params.getfirst("bake.%s.%s" % (bake['rowid'], product['rowid'])))
                         except:
                             qty = 0
-                        c.execute("INSERT INTO bakeorder (userid, bakeid, productid, quantity) VALUES (?, ?, ?, ?)", (userId, bake['rowid'], product['rowid'], qty))
+                        self.addBakeOrder(userId, bake['rowid'], product['rowid'], qty)
 
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
