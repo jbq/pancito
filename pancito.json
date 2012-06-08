@@ -4,6 +4,7 @@
 	"buffer-size": 25000,
 	"module": "pancito:application",
 	"http-socket": ":8080",
-	"pythonpath": [".", "templates"]
+	"pythonpath": [".", "templates"],
+        "touch-reload": ["pancito/__init__.py", "pancito/db.py", "templates/base.py"]
     }
 }
