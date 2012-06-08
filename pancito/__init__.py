@@ -86,6 +86,7 @@ class App(db.DBManager):
         template = Cheetah.Template.Template(file=os.path.join(root, "templates/%s.tmpl" % t))
         template.error = None
         template.success = None
+        template.warning = None
         template.genToken = genToken
         params = self.getQueryParameters()
         template.params = params
@@ -97,6 +98,23 @@ class App(db.DBManager):
         ct = ct.replace(tzinfo=pytz.timezone('UTC'))
         order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
         return order
+
+    def getUserTemplate(self, templateName):
+        template=self.getTemplate(templateName)
+        params = self.getQueryParameters()
+
+        try:
+            userId = int(params.getfirst("userId"))
+        except:
+            raise BadRequest("No user id specified")
+
+        self.conn = opendb()
+        template.user = self.getUser(userId)
+        if template.user is None:
+            raise BadRequest("No such user")
+
+        verifyToken(template.user, params.getfirst('t'))
+        return template
 
     def processRequest(self):
         uri = self.environ['PATH_INFO']
@@ -130,8 +148,22 @@ class App(db.DBManager):
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')
 
+        if uri == "/unsubscribe":
+            template = self.getUserTemplate("unsubscribe")
+
+            if bool(template.user['ismember']) is True:
+                template.error = "En tant qu'adhérent vous ne pouvez pas vous désinscrire de la liste Pancito"
+            elif bool(template.user['ismailing']) is False:
+                template.warning = "Vous êtes déjà désinscrit de la liste Pancito"
+            else:
+                self.setUserMailing(template.user, False)
+                template.success = "Vous avez été désinscrit de la liste Pancito"
+
+            self.addHeader("Content-Type", "text/html")
+            return unicode(template).encode('utf-8')
+
         if uri == "/order":
-            template=self.getTemplate("order")
+            template = self.getUserTemplate("order")
 
             try:
                 userId = int(params.getfirst("userId"))

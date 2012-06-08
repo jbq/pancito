@@ -10,7 +10,8 @@ def encodeHeader(v):
 def writeMail(user):
     with open(os.path.join(pancito.datadir, "mail", "%02u" % user['rowid']), "w") as f:
         t = Cheetah.Template.Template(file=os.path.join(pancito.datadir, "mail.tmpl"))
-        t.url = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
+        t.orderUrl = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
+        t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
         t.email = user['email']
         t.encodeHeader = encodeHeader
         content = unicode(t)
@@ -18,6 +19,6 @@ def writeMail(user):
 
 conn = pancito.opendb()
 c = conn.cursor()
-c.execute("SELECT rowid, * FROM user")
+c.execute("SELECT rowid, * FROM user WHERE ismailing")
 for user in c.fetchall():
     writeMail(user)

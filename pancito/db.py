@@ -1,4 +1,5 @@
 import datetime
+import sqlite3
 
 createTables = [
 '''
@@ -6,7 +7,9 @@ CREATE TABLE user (
     name text unique not null,
     email text unique not null,
     ismember boolean not null default false,
-    creation_time datetime not null default current_timestamp
+    ismailing boolean not null default true,
+    creation_time datetime not null default current_timestamp,
+    unsubscribe_time datetime
 )''',
 
 '''
@@ -104,6 +107,13 @@ class DBManager(object):
         c.execute("INSERT INTO user (name, email) VALUES (?, ?)", (name, email))
         self.conn.commit()
         return c.lastrowid
+
+    def setUserMailing(self, user, mailing):
+        assert isinstance(mailing, bool), "Expecting %s for mailing param, got %s" % (bool, type(mailing))
+        assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
+        c = self.conn.cursor()
+        c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE rowid = ?", (mailing, user['rowid'],))
+        self.conn.commit()
 
     def getUsers(self):
         c = self.conn.cursor()
