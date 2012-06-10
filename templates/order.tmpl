@@ -19,7 +19,7 @@
 		<h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
 		<div class="content">
 			#if $bake.initialOrders.get($user.rowid) and $bake.bakedate > $today
-			<div class="warning" style="margin: .5em">Cette commande a déjà enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y") à $orders.get(1).creation_time.strftime("%Hh%M")</div>
+			<div class="warning" style="margin: .5em">Cette commande a déjà été enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y à %Hh%M")</div>
 			#end if
 			<table class="order">
 				#for $product in $products
