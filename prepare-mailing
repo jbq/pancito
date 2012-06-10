@@ -8,7 +8,7 @@ def encodeHeader(v):
     return email.header.Header(v, 'utf-8').encode()
 
 def writeMail(user):
-    with open(os.path.join(pancito.datadir, "mail", "%02u" % user['rowid']), "w") as f:
+    with open(os.path.join(maildir, "%02u" % user['rowid']), "w") as f:
         t = Cheetah.Template.Template(file=os.path.join(pancito.datadir, "mail.tmpl"))
         t.orderUrl = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
         t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?userId=%s&t=%s' % (user['rowid'], pancito.genToken(user))
@@ -16,6 +16,10 @@ def writeMail(user):
         t.encodeHeader = encodeHeader
         content = unicode(t)
         f.write(content.encode('utf-8'))
+
+maildir = os.path.join(pancito.datadir, "mail")
+if len(os.listdir(maildir)) > 0:
+    raise Exception("data/mail is not empty, aborting to prevent side effects.")
 
 conn = pancito.opendb()
 c = conn.cursor()
