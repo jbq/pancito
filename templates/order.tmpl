@@ -11,14 +11,17 @@
 
 <form method="POST">
 	#for $bake in $bakes
-	#if $bake.bakedate > $today
+	#import datetime
+	#set active = ($bake.bakedatetime - datetime.timedelta(hours=10)) > $now
+	#set past = int(not($active))
+	#if $active
 	<input type="hidden" name="b" value="$bake.rowid">
 	#end if
 	#set $orders = $bake.orders.get($user.rowid) or {}
-	<div class="main past-${int($bake.bakedate <= $today)}">
+	<div class="main past-$past">
 		<h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
 		<div class="content">
-			#if $bake.initialOrders.get($user.rowid) and $bake.bakedate > $today
+			#if $bake.initialOrders.get($user.rowid) and $active
 			<div class="warning" style="margin: .5em">Cette commande a déjà été enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y à %Hh%M")</div>
 			#end if
 			<table class="order">
@@ -37,7 +40,7 @@
 						#else
 						#set $qty = 0
 						#end if
-						#if $bake.bakedate > $today
+						#if $active
 						<input type="text" name="bake.${bake.rowid}.${product.rowid}" value="$qty">
 						#else
 						<span class="quantity">$qty</span>
@@ -45,7 +48,7 @@
 					</td>
 				</tr>
 				#end for
-				#if $bake.bakedate > $today
+				#if $active
 				<tr>
 					<td class="submit" colspan=2>
 						<div style="text-align: right">

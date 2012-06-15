@@ -76,7 +76,8 @@ class DBManager(object):
 
     def toDisplayBake(self, row):
         d = dict(row)
-        d['bakedate'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d").date()
+        d['bakedatetime'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
+        d['bakedate'] = d['bakedatetime'].date()
         return d
 
     def getBakes(self):

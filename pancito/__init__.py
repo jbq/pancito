@@ -88,7 +88,7 @@ class App(db.DBManager):
         template.success = None
         template.warning = None
         template.genToken = genToken
-        template.today = datetime.date.today()
+        template.now = datetime.datetime.now()
         params = self.getQueryParameters()
         template.params = params
         return template
