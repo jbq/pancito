@@ -3,7 +3,8 @@
 #extends base.base
 
 #def content
-#if $params.getfirst('admin')
+#set $admin = $params.getfirst('admin')
+#if $admin
 <h1>Commandes de ${user.name}</h1>
 #elif not($success)
 <p class="info">Pour commander du pain, renseignez la quantité puis cliquez sur le bouton <i>Enregistrer</i></p>
@@ -12,7 +13,7 @@
 <form method="POST">
 	#for $bake in $bakes
 	#import datetime
-	#set active = ($bake.bakedatetime - datetime.timedelta(hours=10)) > $now
+	#set active = ($bake.bakedatetime - datetime.timedelta(hours=10)) > $now or $admin
 	#set past = int(not($active))
 	#if $active
 	<input type="hidden" name="b" value="$bake.rowid">
