@@ -65,7 +65,7 @@ class DBManager(object):
         return ordersByField
 
     def buildBakesWithOrdersByUser(self):
-        for bake in self.getBakes():
+        for bake in self.getFutureBakes():
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
             yield bake
 
@@ -79,6 +79,12 @@ class DBManager(object):
         d['bakedatetime'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
         d['bakedate'] = d['bakedatetime'].date()
         return d
+
+    def getFutureBakes(self):
+        c = self.conn.cursor()
+        c.execute("SELECT rowid, * from bake WHERE bakedate > CURRENT_DATE")
+        for row in c.fetchall():
+            yield self.toDisplayBake(row)
 
     def getBakes(self):
         c = self.conn.cursor()
