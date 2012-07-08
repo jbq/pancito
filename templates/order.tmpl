@@ -7,7 +7,7 @@
 #if $admin
 <h1>Commandes de ${user.name}</h1>
 #elif not($success)
-<p class="info">Pour commander du pain, renseignez la quantité puis cliquez sur le bouton <i>Enregistrer</i></p>
+<p class="info">Vous êtes identifié en tant que «&nbsp;$user.name&nbsp;». Pour commander du pain, renseignez la quantité puis cliquez sur le bouton <i>Enregistrer</i></p>
 #end if
 
 <form method="POST">
