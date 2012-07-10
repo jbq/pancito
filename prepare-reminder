@@ -1,14 +1,16 @@
 #! /usr/bin/python
 import os.path
+import pancito
 import pancito.mail
+import sys
 
-template = os.path.join(pancito.datadir, "mail.tmpl")
+template = "data/reminder.tmpl"
 maildir = os.path.join(pancito.datadir, "mail")
 if len(os.listdir(maildir)) > 0:
     raise Exception("data/mail is not empty, aborting to prevent side effects.")
 
 conn = pancito.opendb()
 c = conn.cursor()
-c.execute("SELECT rowid, * FROM user WHERE ismailing")
+c.execute("SELECT rowid, * FROM user WHERE ismailing AND rowid NOT IN (SELECT userid FROM bakeorder WHERE bakeid = ?)", (int(sys.argv[1]),))
 for user in c.fetchall():
     pancito.mail.writeMail(user, maildir, template)
