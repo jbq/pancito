@@ -13,7 +13,7 @@
 <form method="POST">
 	#for $bake in $bakes
 	#import datetime
-	#set active = ($bake.bakedatetime - datetime.timedelta(hours=10)) > $now or $admin
+	#set active = ($bake.bakedatetime - datetime.timedelta(hours=4)) > $now or $admin
 	#set past = int(not($active))
 	#if $active
 	<input type="hidden" name="b" value="$bake.rowid">
