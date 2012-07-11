@@ -133,6 +133,11 @@ class DBManager(object):
         c.execute("SELECT rowid, * from user")
         return c.fetchall()
 
+    def getUsersWithOrder(self, bakeIds):
+        c = self.conn.cursor()
+        c.execute("SELECT rowid, * from user WHERE rowid IN (SELECT userid FROM bakeorder WHERE bakeid IN (?))", (", ".join(bakeIds),))
+        return c.fetchall()
+
     def deleteBakeOrders(self, user_id, bake_id):
         assert isinstance(user_id, int)
         assert isinstance(bake_id, int)
