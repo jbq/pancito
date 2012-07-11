@@ -143,7 +143,10 @@ class App(db.DBManager):
         if uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
-            template.bakes = list(self.buildBakesWithOrdersByUser())
+            displayedBakes = list(self.getBakesForIds(params.getlist('b')))
+            if len(displayedBakes) == 0:
+                displayedBakes = self.getBakes()
+            template.bakes = list(self.buildSpecifiedBakesWithOrdersByUser(displayedBakes))
 
             template.users = self.getUsers()
             self.addHeader("Content-Type", "text/html")

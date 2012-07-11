@@ -64,6 +64,11 @@ class DBManager(object):
                 ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
         return ordersByField
 
+    def buildSpecifiedBakesWithOrdersByUser(self, bakes):
+        for bake in bakes:
+            bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
+            yield bake
+
     def buildBakesWithOrdersByUser(self):
         for bake in self.getFutureBakes():
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
