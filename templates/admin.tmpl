@@ -2,6 +2,7 @@
 #extends base.base
 
 #def content
+#set printSty = $params.getfirst('print')
 <div class="main">
 <h2>Admin</h2>
 
@@ -36,7 +37,9 @@
 			#end if
 			#end for
 			<td>
+#if not $printSty
 			<a href="/order?userId=${user.rowid}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
+#end if
 			</td>
 		</tr>
 		#end for
