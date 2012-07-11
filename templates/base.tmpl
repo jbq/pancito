@@ -3,14 +3,17 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
 <title>Pancito</title>
+#set printSty = $params.getfirst('print')
 
 <style type="text/css">
 body {
 font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
 color: white;
+#if not $printSty
 background: #111111 url(http://3.bp.blogspot.com/-g9tyFyMbiHY/T6KwI7gX0VI/AAAAAAAAE_w/pGWBQwVYrrk/s1600/pancito.JPG) repeat scroll top left;
 margin-left: 25%;
 margin-right: 25%;
+#end if
 }
 
 h1, h2 {
