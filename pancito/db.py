@@ -128,9 +128,14 @@ class DBManager(object):
         c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE rowid = ?", (mailing, user['rowid'],))
         self.conn.commit()
 
-    def getUsers(self):
+    def getUsers(self, ismailing=False):
         c = self.conn.cursor()
-        c.execute("SELECT rowid, * from user")
+        params = []
+        clauses = ["SELECT rowid, * from user"]
+        if ismailing:
+            clauses.append("WHERE ismailing = ?")
+            params.append(ismailing)
+        c.execute(" ".join(clauses), params)
         return c.fetchall()
 
     def getUsersWithOrder(self, bakeIds):

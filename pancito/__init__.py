@@ -148,14 +148,20 @@ class App(db.DBManager):
             self.conn = opendb()
             template=self.getTemplate("admin")
             displayedBakeIds = params.getlist('b')
+            displayMailedUsers = (params.getfirst('du') == "mailed")
+            displayAllUsers = (params.getfirst('du') == "all")
             displayedBakes = list(self.getBakesForIds(displayedBakeIds))
+
             if len(displayedBakes) == 0:
                 displayedBakes = self.getBakes()
-                template.users = self.getUsers()
+                template.users = self.getUsers(ismailing=displayMailedUsers)
             else:
-                template.users = self.getUsersWithOrder(displayedBakeIds)
-            template.bakes = list(self.buildSpecifiedBakesWithOrdersByUser(displayedBakes))
+                if displayAllUsers or displayMailedUsers:
+                    template.users = self.getUsers(ismailing=displayMailedUsers)
+                else:
+                    template.users = self.getUsersWithOrder(displayedBakeIds)
 
+            template.bakes = list(self.buildSpecifiedBakesWithOrdersByUser(displayedBakes))
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')
 
