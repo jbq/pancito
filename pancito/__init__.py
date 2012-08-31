@@ -61,9 +61,13 @@ class App(db.DBManager):
         self.headers.append((name, value))
 
     def handleRequest(self):
-        value = self.processRequest()
-        self._startResponse(self.status, self.headers)
-        return value
+        try:
+            value = self.processRequest()
+            self._startResponse(self.status, self.headers)
+            return value
+        except BadRequest:
+            self._startResponse("400 Bad Request", [('Content-Type', 'text/html')])
+            return "<h1>Requête incorrecte</h1>"
         #try:
         #except:
         #    import cgitb
