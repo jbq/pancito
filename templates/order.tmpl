@@ -16,7 +16,7 @@
 	#set active = ($bake.bakedatetime - datetime.timedelta(hours=4)) > $now or $admin
 	#set past = int(not($active))
 	#if $active
-	<input type="hidden" name="b" value="$bake.rowid">
+	<input type="hidden" name="sb" value="$bake.rowid">
 	#end if
 	#set $orders = $bake.orders.get($user.rowid) or {}
 	<div class="main past-$past">

@@ -69,8 +69,8 @@ class DBManager(object):
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
             yield bake
 
-    def buildBakesWithOrdersByUser(self):
-        for bake in self.getFutureBakes():
+    def buildBakesWithOrdersByUser(self, bakes):
+        for bake in bakes:
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
             yield bake
 

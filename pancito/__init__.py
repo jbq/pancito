@@ -195,15 +195,20 @@ class App(db.DBManager):
             verifyToken(template.user, params.getfirst('t'))
 
             template.products = self.getProducts()
-            editedBakes = list(self.getBakesForIds(params.getlist('b')))
 
             initialBakes = None
             if method == "GET":
-                initialBakes = list(self.buildBakesWithOrdersByUser())
+                editedBakes = list(self.getBakesForIds(params.getlist('b')))
+                if len(editedBakes) == 0:
+                    editedBakes = self.getFutureBakes()
+                initialBakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             elif method == "POST":
                 # Don't display existing order warning when we do a POST
                 initialBakes = None
 
+                # 'b' param may not be specified in URL so another 'sb' for
+                # hidden bake id in form
+                editedBakes = list(self.getBakesForIds(params.getlist('sb')))
                 for bake in editedBakes:
                     self.deleteBakeOrders(userId, bake['rowid'])
                     for product in template.products:
@@ -216,7 +221,7 @@ class App(db.DBManager):
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
 
-            template.bakes = list(self.buildBakesWithOrdersByUser())
+            template.bakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             for i, bake in enumerate(template.bakes):
                 if initialBakes is not None:
                     bake['initialOrders'] = initialBakes[i]['orders']
