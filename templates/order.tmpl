@@ -4,10 +4,16 @@
 
 #def content
 #set $admin = $params.getfirst('admin')
+#if not($success or $error)
 #if $admin
 <h1>Commandes de ${user.name}</h1>
-#elif not($success)
+#else
 <p class="info">Vous êtes identifié en tant que «&nbsp;$user.name&nbsp;». Pour commander du pain, renseignez la quantité puis cliquez sur le bouton <i>Enregistrer</i></p>
+#end if
+#elif $success
+<div class="success">
+$success
+</div>
 #end if
 
 <form method="POST">
@@ -18,11 +24,11 @@
 	#if $active
 	<input type="hidden" name="sb" value="$bake.rowid">
 	#end if
-	#set $orders = $bake.orders.get($user.rowid) or {}
+	#set $orders = $bake.orders.get($user.id) or {}
 	<div class="main past-$past">
 		<h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")</h2>
 		<div class="content">
-			#if $bake.initialOrders.get($user.rowid) and $active
+			#if $bake.initialOrders.get($user.id) and $active
 			<div class="warning" style="margin: .5em">Cette commande a déjà été enregistrée le $orders.get(1).creation_time.strftime("%A %d %B %Y à %Hh%M")</div>
 			#end if
 			<table class="order">

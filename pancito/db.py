@@ -2,13 +2,18 @@ import datetime
 import sqlite3
 
 createTables = [
-'''
-CREATE TABLE user (
-    name text unique not null,
+'''CREATE TABLE user (
+    id integer primary key autoincrement not null,
+    name text not null,
     email text unique not null,
+    address text,
+    postcode text,
+    locality text,
+    phone text,
     ismember boolean not null default 0,
     ismailing boolean not null default 1,
     creation_time datetime not null default current_timestamp,
+    email_confirm_time datetime,
     unsubscribe_time datetime
 )''',
 
@@ -112,12 +117,14 @@ class DBManager(object):
 
     def getUser(self, userId):
         c = self.conn.cursor()
-        c.execute("SELECT rowid, * from user WHERE rowid = ?", (userId,))
+        c.execute("SELECT * from user WHERE id = ?", (userId,))
         return c.fetchone()
 
-    def addUser(self, name, email):
+    def register(self, fields, d):
         c = self.conn.cursor()
-        c.execute("INSERT INTO user (name, email) VALUES (?, ?)", (name, email))
+        query = "INSERT INTO user (%s) VALUES (%s)" % (", ".join(fields), ", ".join(['?' for k in fields]))
+        params = [d[k] for k in fields]
+        c.execute(query, params)
         self.conn.commit()
         return c.lastrowid
 
@@ -125,13 +132,13 @@ class DBManager(object):
         assert isinstance(mailing, bool), "Expecting %s for mailing param, got %s" % (bool, type(mailing))
         assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
         c = self.conn.cursor()
-        c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE rowid = ?", (mailing, user['rowid'],))
+        c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE id = ?", (mailing, user['id'],))
         self.conn.commit()
 
     def getUsers(self, ismailing=False):
         c = self.conn.cursor()
         params = []
-        clauses = ["SELECT rowid, * from user"]
+        clauses = ["SELECT * from user"]
         if ismailing:
             clauses.append("WHERE ismailing = ?")
             params.append(ismailing)
@@ -140,7 +147,7 @@ class DBManager(object):
 
     def getUsersWithOrder(self, bakeIds):
         c = self.conn.cursor()
-        c.execute("SELECT rowid, * from user WHERE rowid IN (SELECT userid FROM bakeorder WHERE bakeid IN (?))", (", ".join(bakeIds),))
+        c.execute("SELECT * from user WHERE id IN (SELECT userid FROM bakeorder WHERE bakeid IN (?))", (", ".join(bakeIds),))
         return c.fetchall()
 
     def deleteBakeOrders(self, user_id, bake_id):
@@ -156,3 +163,9 @@ class DBManager(object):
         assert isinstance(qty, int)
         c = self.conn.cursor()
         c.execute("INSERT INTO bakeorder (userid, bakeid, productid, quantity) VALUES (?, ?, ?, ?)", (user_id, bake_id, product_id, qty))
+
+    def confirmEmail(self, user_id):
+        assert isinstance(user_id, int)
+        c = self.conn.cursor()
+        c.execute("UPDATE user SET email_confirm_time = datetime('now') WHERE id = ?", (user_id,))
+        self.conn.commit()

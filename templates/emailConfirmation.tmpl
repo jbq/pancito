@@ -1,0 +1,33 @@
+#encoding utf-8
+#import base
+#extends base.base
+
+#def content
+<h1>Inscription confirmée</h1>
+
+<p class="info">Vous êtes identifié en tant que «&nbsp;$user.name&nbsp;». Votre
+inscription est maintenant confirmée.</i></p>
+
+<div class="main">
+    <h2>Merci pour votre soutien à Pancito!</h2>
+    <div class="content">
+<div class="text">
+#if len($futureBakes) > 0
+        <p>Pour goûter le pain et tester le fonctionnement d'une distribution
+avant de souscrire à un abonnement, voici les prochaines dates où vous pourrez
+nous rencontrer, veuillez sélectionner le créneau qui vous convient et passer
+votre commande:</p>
+
+<ul>
+#for $bake in $futureBakes[:4]
+<li><a href="order?b=${bake.rowid}&amp;userId=${params.getfirst('userId')}&amp;t=${params.getfirst('t')}">$bake.bakedate.strftime("%A %d %B %Y") entre
+18h30 et 19h30</a></li>
+#end for
+</ul>
+#else
+<p>Nous vous tiendrons au courant par email dès qu'une place est disponible.</p>
+#end if
+</div>
+    </div>
+</div>
+#end def

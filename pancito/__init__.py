@@ -3,7 +3,8 @@ import os.path, StringIO, sys, operator, datetime, cgi
 import Cheetah.Template
 import sqlite3, hashlib
 import pytz
-import db
+import db, mail
+import traceback, subprocess
 
 import locale
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
@@ -33,7 +34,7 @@ def opendb():
 
 def genToken(user):
     s = hashlib.sha1()
-    s.update(str(user['rowid']))
+    s.update(str(user['id']))
     s.update(user['email'])
     s.update(secretKey)
 
@@ -66,6 +67,7 @@ class App(db.DBManager):
             self._startResponse(self.status, self.headers)
             return value
         except BadRequest:
+            traceback.print_exc()
             self._startResponse("400 Bad Request", [('Content-Type', 'text/html')])
             return "<h1>Requête incorrecte</h1>"
         #try:
@@ -126,24 +128,6 @@ class App(db.DBManager):
         method = self.environ['REQUEST_METHOD']
         params = self.getQueryParameters()
 
-        if uri == "/addFriend" and method == "POST":
-            template=self.getTemplate("addFriend")
-
-            name = params.getfirst('name')
-            email = params.getfirst('email')
-
-            if name is None:
-                template.error = "Veuillez entrer le nom"
-            if email is None:
-                template.error = "Veuillez entrer l'adresse email"
-
-            if template.error is None:
-                try:
-                    self.addUser(name, email)
-                except sqlite3.IntegrityError:
-                    template.error = u"Cet utilisateur est déjà enregistré"
-            return unicode(template).encode('utf-8')
-
         if uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
@@ -179,21 +163,67 @@ class App(db.DBManager):
             self.addHeader("Content-Type", "text/html")
             return unicode(template).encode('utf-8')
 
+        if uri == "/register" :
+            template = self.getTemplate("register")
+            self.conn = opendb()
+            template.products = self.getProducts()
+
+            def checkProducts():
+                for product in self.getProducts():
+                    v = params.getfirst("product.%s" % product['rowid'])
+                    if v is not None:
+                        try:
+                            if int(v) > 0:
+                                return True
+                        except:
+                            return False
+                return False
+
+            def getRegistration(fields):
+                d = {}
+                for f in fields:
+                    v = params.getfirst(f).decode('utf8')
+                    if v is None:
+                        return None
+                    d[f] = v
+                return d
+
+            if method == "POST":
+                fields = ('name', 'email', 'address', 'postcode', 'locality', 'phone')
+                d = getRegistration(fields)
+
+                if d is None:
+                    template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
+                if not checkProducts():
+                    template.error = "Veuillez préciser votre commande hebdomadaire avec au moins un produit!"
+
+                if template.error is None:
+                    try:
+                        rowid = self.register(fields, d)
+                        user = self.getUser(rowid)
+                        cmd = ["sendmail", "-it"]
+                        p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+                        p.stdin.write(mail.mail_template(user, "templates/registrationEmail.tmpl"))
+                        p.stdin.close()
+                        sc = p.wait()
+                        if sc != 0:
+                            raise Exception("Command returned status code %s: %s" % (sc, cmd))
+                        template.success = True
+                    except sqlite3.IntegrityError:
+                        template.error = "L'adresse email que vous avez renseigné existe déjà.  L'inscription a déjà été effectuée."
+
+            self.addHeader("Content-Type", "text/html")
+            return unicode(template).encode('utf-8')
+
+        if uri == "/emailConfirmation":
+            template = self.getUserTemplate("emailConfirmation")
+            self.confirmEmail(template.user['id'])
+            template.futureBakes = list(self.getFutureBakes())
+            self.addHeader("Content-Type", "text/html")
+            return unicode(template).encode('utf-8')
+
         if uri == "/order":
             template = self.getUserTemplate("order")
-
-            try:
-                userId = int(params.getfirst("userId"))
-            except:
-                raise BadRequest("No user id specified")
-
-            self.conn = opendb()
-            template.user = self.getUser(userId)
-            if template.user is None:
-                raise BadRequest("No such user")
-
-            verifyToken(template.user, params.getfirst('t'))
-
             template.products = self.getProducts()
 
             initialBakes = None

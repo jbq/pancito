@@ -1,0 +1,119 @@
+#encoding utf-8
+#import base
+#extends base.base
+
+#def content
+#if not($success or $error)
+<p class="info">Vous souhaitez vous inscrire pour une distribution de pain
+hebdomadaire? Veuillez renseigner vos coordonnées et votre formule
+hebdomadaire, puis cliquez sur le bouton <i>Enregistrer</i></p>
+#else if $success
+<div class="success">Votre demande d'inscription a bien été prise en compte,
+vous allez recevoir un email de confirmation. Si vous ne recevez rien, merci de
+vérifier que le message n'est pas dans le dossier Spam. Si vous ne retrouvez pas
+notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
+<a href="/register">recommencez l'inscription</a>.</div>
+#end if
+
+<form method="POST" accept-charset="UTF-8">
+  <div class="main">
+    <h2>Vos coordonnées</h2>
+    <div class="content">
+      <table class="order">
+        <tr>
+          <td>Nom</td>
+          <td>
+#if $success
+          $params.getfirst('name')
+#else
+            <input type='text' name='name' value="$params.getfirst('name')">
+            <span class="note">Par exemple: <i>M. et Mme Durand</i>, <i>Alain
+Maubert</i>, <i>Famille Truchaud</i>…</span>
+#end if
+          </td>
+        </tr>
+        <tr>
+          <td>Email</td>
+          <td>
+#if $success
+          <tt>$params.getfirst('email')</tt>
+#else
+            <input type='text' name='email' value="$params.getfirst('email')">
+            <span class="note">Vous allez recevoir des instructions à cette adresse pour
+            compléter votre inscription</span>
+#end if
+          </td>
+        </tr>
+        <tr>
+          <td>Adresse</td>
+          <td>
+#if $success
+          <pre>$params.getfirst('address')
+$params.getfirst('postcode') $params.getfirst('locality')</pre>
+#else
+            <textarea name='address'>$params.getfirst('address')</textarea>
+        </td>
+        </tr>
+        <tr>
+          <td>Code postal</td>
+          <td><input type='text' name='postcode' value="$params.getfirst('postcode')"></td>
+        </tr>
+        <tr>
+          <td>Ville</td>
+          <td><input type='text' name='locality' value="$params.getfirst('locality')">
+#end if
+          </td>
+        </tr>
+        <tr>
+          <td>Téléphone</td>
+          <td>
+#if $success
+$params.getfirst('phone')
+#else
+            <input type='text' name='phone' value="$params.getfirst('phone')">
+            <span class="note">Ce numéro de téléphone sera utilisé pour vous
+            prévenir au cas où une distribution doit être annulée en dernière
+            minute.</span>
+#end if
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="main">
+    <h2>Commande hebdomadaire
+    <span class="note">Vous pourrez par la suite affiner ce choix et personnaliser votre calendrier de distribution</span>
+    </h2>
+
+    <div class="content">
+      <table class="order">
+        #for $product in $products
+        <tr>
+          <td>
+            <i>
+            $product.name
+            </i>
+          </td>
+          <td>
+            Quantité:&nbsp;
+#if $success
+            ${params.getfirst("product.%s" % $product.rowid) or 0}
+#else
+            <input type="text" name="product.${product.rowid}" value="$params.getfirst("product.%s" % $product.rowid)">
+#end if
+          </td>
+        </tr>
+        #end for
+        <tr>
+          <td class="submit" colspan=2>
+            <div style="text-align: right">
+              <input type="submit" value="Enregistrer">
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</form>
+#end def
