@@ -200,7 +200,7 @@ class App(db.DBManager):
             if method == "GET":
                 editedBakes = list(self.getBakesForIds(params.getlist('b')))
                 if len(editedBakes) == 0:
-                    editedBakes = self.getFutureBakes()
+                    editedBakes = list(self.getFutureBakes())
                 initialBakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             elif method == "POST":
                 # Don't display existing order warning when we do a POST

@@ -87,7 +87,7 @@ class DBManager(object):
 
     def getFutureBakes(self):
         c = self.conn.cursor()
-        c.execute("SELECT rowid, * from bake WHERE bakedate > CURRENT_DATE")
+        c.execute("SELECT rowid, * from bake WHERE bakedate >= CURRENT_DATE")
         for row in c.fetchall():
             yield self.toDisplayBake(row)
 
