@@ -5,7 +5,7 @@ import pancito.mail
 template = os.path.join(pancito.datadir, "mail.tmpl")
 maildir = os.path.join(pancito.datadir, "mail")
 if len(os.listdir(maildir)) > 0:
-    raise Exception("data/mail is not empty, aborting to prevent side effects.")
+    raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
 
 conn = pancito.opendb()
 c = conn.cursor()
