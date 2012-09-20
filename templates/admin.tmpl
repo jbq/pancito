@@ -25,7 +25,7 @@
 			$user.name
 			</td>
 			#for $bake in $bakes
-			#set $orders = $bake.orders.get($user.rowid)
+			#set $orders = $bake.orders.get($user.id)
 			#if $orders and sum([$x.quantity for x in $orders.values()]) > 0
 			<td class="y">
 			$orders.get(1).quantity + $orders.get(2).quantity
@@ -38,7 +38,7 @@
 			#end for
 			<td>
 #if not $printSty
-			<a href="/order?userId=${user.rowid}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
+			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
 #end if
 			</td>
 		</tr>
