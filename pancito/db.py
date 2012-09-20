@@ -125,7 +125,6 @@ class DBManager(object):
         query = "INSERT INTO user (%s) VALUES (%s)" % (", ".join(fields), ", ".join(['?' for k in fields]))
         params = [d[k] for k in fields]
         c.execute(query, params)
-        self.conn.commit()
         return c.lastrowid
 
     def setUserMailing(self, user, mailing):

@@ -203,11 +203,12 @@ class App(db.DBManager):
                         user = self.getUser(rowid)
                         cmd = ["sendmail", "-it"]
                         p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-                        p.stdin.write(mail.mail_template(user, "templates/registrationEmail.tmpl"))
+                        p.stdin.write(mail.mail_template(user, "%s/templates/registrationEmail.tmpl" % root))
                         p.stdin.close()
                         sc = p.wait()
                         if sc != 0:
                             raise Exception("Command returned status code %s: %s" % (sc, cmd))
+                        self.conn.commit()
                         template.success = True
                     except sqlite3.IntegrityError:
                         template.error = "L'adresse email que vous avez renseigné existe déjà.  L'inscription a déjà été effectuée."
