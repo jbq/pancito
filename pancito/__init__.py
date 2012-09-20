@@ -240,13 +240,13 @@ class App(db.DBManager):
                 # hidden bake id in form
                 editedBakes = list(self.getBakesForIds(params.getlist('sb')))
                 for bake in editedBakes:
-                    self.deleteBakeOrders(userId, bake['rowid'])
+                    self.deleteBakeOrders(template.user['id'], bake['rowid'])
                     for product in template.products:
                         try:
                             qty = int(params.getfirst("bake.%s.%s" % (bake['rowid'], product['rowid'])))
                         except:
                             qty = 0
-                        self.addBakeOrder(userId, bake['rowid'], product['rowid'], qty)
+                        self.addBakeOrder(template.user['id'], bake['rowid'], product['rowid'], qty)
 
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
