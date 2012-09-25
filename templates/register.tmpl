@@ -98,9 +98,9 @@ $params.getfirst('phone')
           <td>
             Quantité:&nbsp;
 #if $success
-            ${params.getfirst("product.%s" % $product.rowid) or 0}
+            ${params.getfirst("product.%s" % $product.id) or 0}
 #else
-            <input type="text" name="product.${product.rowid}" value="$params.getfirst("product.%s" % $product.rowid)">
+            <input type="text" name="product.${product.id}" value="$params.getfirst("product.%s" % $product.id)">
 #end if
           </td>
         </tr>

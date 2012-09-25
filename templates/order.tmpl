@@ -33,11 +33,11 @@ $success
       #end if
       <table class="order">
         #for $product in $products
-        #set $order = $orders.get($product.rowid)
+        #set $order = $orders.get($product.id)
         <tr>
           <td>
             <i>
-            $product.name
+            $product.name, $displayAmount($product.itemprice) € l'unité
             </i>
             </td>
             <td>
@@ -48,7 +48,7 @@ $success
             #set $qty = 0
             #end if
             #if $active
-            <input type="text" name="bake.${bake.rowid}.${product.rowid}" value="$qty">
+            <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
             #else
             <span class="quantity">$qty</span>
             #end if

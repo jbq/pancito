@@ -47,6 +47,11 @@ def verifyToken(user, token):
     if token != genToken(user):
         raise BadRequest("Token mismatch")
 
+def displayAmount(v):
+    assert isinstance(v, int)
+    vv = str(v)
+    return "%s,%s" % (vv[:-2], vv[-2:])
+
 class BadRequest(Exception):
     pass
 
@@ -94,6 +99,7 @@ class App(db.DBManager):
         template.success = None
         template.warning = None
         template.genToken = genToken
+        template.displayAmount = displayAmount
         template.now = datetime.datetime.now()
         params = self.getQueryParameters()
         template.params = params
@@ -170,7 +176,7 @@ class App(db.DBManager):
 
             def checkProducts():
                 for product in self.getProducts():
-                    v = params.getfirst("product.%s" % product['rowid'])
+                    v = params.getfirst("product.%s" % product['id'])
                     if v is not None:
                         try:
                             if int(v) > 0:
@@ -201,6 +207,13 @@ class App(db.DBManager):
                     try:
                         rowid = self.register(fields, d)
                         user = self.getUser(rowid)
+                        self.deleteAdhesionOrders(user['id'])
+                        for product in template.products:
+                            try:
+                                qty = int(params.getfirst("product.%s" % product['id']))
+                            except:
+                                qty = 0
+                            self.addAdhesionOrder(user['id'], product['id'], qty)
                         cmd = ["sendmail", "-it"]
                         p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
                         p.stdin.write(mail.mail_template(user, "%s/templates/registrationEmail.tmpl" % root))
@@ -210,7 +223,7 @@ class App(db.DBManager):
                             raise Exception("Command returned status code %s: %s" % (sc, cmd))
                         self.conn.commit()
                         template.success = True
-                    except sqlite3.IntegrityError:
+                    except db.EmailAlreadyExists:
                         template.error = "L'adresse email que vous avez renseigné existe déjà.  L'inscription a déjà été effectuée."
 
             self.addHeader("Content-Type", "text/html")
@@ -244,10 +257,10 @@ class App(db.DBManager):
                     self.deleteBakeOrders(template.user['id'], bake['rowid'])
                     for product in template.products:
                         try:
-                            qty = int(params.getfirst("bake.%s.%s" % (bake['rowid'], product['rowid'])))
+                            qty = int(params.getfirst("bake.%s.%s" % (bake['rowid'], product['id'])))
                         except:
                             qty = 0
-                        self.addBakeOrder(template.user['id'], bake['rowid'], product['rowid'], qty)
+                        self.addBakeOrder(template.user['id'], bake['rowid'], product['id'], qty)
 
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
