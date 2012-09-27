@@ -216,7 +216,7 @@ class App(db.DBManager):
                             self.addAdhesionOrder(user['id'], product['id'], qty)
                         cmd = ["sendmail", "-it"]
                         p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-                        p.stdin.write(mail.mail_template(user, "%s/templates/registrationEmail.tmpl" % root))
+                        p.stdin.write(mail.mail_template(user, "%s/mail/registrationEmail.tmpl" % datadir))
                         p.stdin.close()
                         sc = p.wait()
                         if sc != 0:
