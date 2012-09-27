@@ -2,6 +2,10 @@
 #import base
 #extends base.base
 
+#def field(k)
+${params.getfirst(k) or $user[$k]}
+#end def
+
 #def content
 #if not($success or $error)
 <p class="info">Vous souhaitez vous inscrire pour une distribution de pain
@@ -16,17 +20,21 @@ notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
 #end if
 
 <form method="POST" accept-charset="UTF-8">
+#* hidden fields to propagate optional parameters *#
+<input type="hidden" name="c" value="$params.getfirst('c')">
+<input type="hidden" name="u" value="$params.getfirst('u')">
+
   <div class="main">
     <h2>Vos coordonnées</h2>
     <div class="content">
       <table class="order">
         <tr>
-          <td>Nom</td>
+          <td>Nom complet</td>
           <td>
 #if $success
-          $params.getfirst('name')
+          $field('name')
 #else
-            <input type='text' name='name' value="$params.getfirst('name')">
+            <input type='text' name='name' value="$field('name')">
             <span class="note">Par exemple: <i>M. et Mme Durand</i>, <i>Alain
 Maubert</i>, <i>Famille Truchaud</i>…</span>
 #end if
@@ -36,9 +44,9 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
           <td>Email</td>
           <td>
 #if $success
-          <tt>$params.getfirst('email')</tt>
+          <tt>$field('email')</tt>
 #else
-            <input type='text' name='email' value="$params.getfirst('email')">
+            <input type='text' name='email' value="$field('email')">
             <span class="note">Vous allez recevoir des instructions à cette adresse pour
             compléter votre inscription</span>
 #end if
@@ -48,19 +56,19 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
           <td>Adresse</td>
           <td>
 #if $success
-          <pre>$params.getfirst('address')
-$params.getfirst('postcode') $params.getfirst('locality')</pre>
+          <pre>$field('address')
+$field('postcode') $field('locality')</pre>
 #else
-            <textarea name='address'>$params.getfirst('address')</textarea>
+            <textarea name='address'>$field('address')</textarea>
         </td>
         </tr>
         <tr>
           <td>Code postal</td>
-          <td><input type='text' name='postcode' value="$params.getfirst('postcode')"></td>
+          <td><input type='text' name='postcode' value="$field('postcode')"></td>
         </tr>
         <tr>
           <td>Ville</td>
-          <td><input type='text' name='locality' value="$params.getfirst('locality')">
+          <td><input type='text' name='locality' value="$field('locality')">
 #end if
           </td>
         </tr>
@@ -68,9 +76,9 @@ $params.getfirst('postcode') $params.getfirst('locality')</pre>
           <td>Téléphone</td>
           <td>
 #if $success
-$params.getfirst('phone')
+$field('phone')
 #else
-            <input type='text' name='phone' value="$params.getfirst('phone')">
+            <input type='text' name='phone' value="$field('phone')">
             <span class="note">Ce numéro de téléphone sera utilisé pour vous
             prévenir au cas où une distribution doit être annulée en dernière
             minute.</span>
@@ -88,7 +96,7 @@ $params.getfirst('phone')
 
     <div class="content">
       <table class="order">
-        #for $product in $products
+        #for i, product in enumerate($products)
         <tr>
           <td>
             <i>
@@ -98,9 +106,9 @@ $params.getfirst('phone')
           <td>
             Quantité:&nbsp;
 #if $success
-            ${params.getfirst("product.%s" % $product.id) or 0}
+            ${params.getfirst("product.%s" % $product.id)}
 #else
-            <input type="text" name="product.${product.id}" value="$params.getfirst("product.%s" % $product.id)">
+            <input type="text" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or $orders[$i].quantity}">
 #end if
           </td>
         </tr>

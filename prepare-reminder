@@ -5,7 +5,7 @@ import pancito.mail
 import sys
 
 template = "data/reminder.tmpl"
-maildir = os.path.join(pancito.datadir, "mail")
+maildir = "tmp/mail"
 if len(os.listdir(maildir)) > 0:
     raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
 

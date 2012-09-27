@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+import pytz
 
 createTables = [
 '''CREATE TABLE user (
@@ -82,6 +83,19 @@ class DBManager(object):
     def getBakeOrdersByUserId(self, bakeId):
         return self.getBakeOrdersByField(bakeId, "userid", "productid")
 
+    def displayOrder(self, order):
+        order = dict(order)
+        ct = datetime.datetime.strptime(order['creation_time'], "%Y-%m-%d %H:%M:%S")
+        ct = ct.replace(tzinfo=pytz.timezone('UTC'))
+        order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
+        return order
+
+    def getBakeOrders(self, bakeId, userId):
+        assert isinstance(bakeId, (int, long)), "Expecting %s for bakeId, got %s" % (int, type(bakeId))
+        c = self.conn.cursor()
+        c.execute("SELECT rowid, * from bakeorder WHERE bakeid = ? AND userid = ?", (bakeId, userId))
+        return c.fetchall()
+
     def getBakeOrdersByField(self, bakeId, field, subfield):
         assert isinstance(bakeId, (int, long)), "Expecting %s for bakeId, got %s" % (int, type(bakeId))
         c = self.conn.cursor()
@@ -99,14 +113,14 @@ class DBManager(object):
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
             yield bake
 
+    def buildBakesWithOrders(self, bakes, userId):
+        for bake in bakes:
+            bake["orders"] = self.getBakeOrders(bake['rowid'], userId)
+            yield bake
+
     def buildBakesWithOrdersByUser(self, bakes):
         for bake in bakes:
             bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
-            yield bake
-
-    def buildBakesWithOrdersByProduct(self):
-        for bake in self.getBakes():
-            bake["orders"] = self.getBakeOrdersByProductId(bake['rowid'])
             yield bake
 
     def toDisplayContract(self, row):
@@ -129,7 +143,8 @@ class DBManager(object):
             yield self.toDisplayBake(row)
 
     def getBakes(self, contractId=None):
-        assert isinstance(contractId, (int, long)), "Expecting %s for contractId, got %s" % (int, type(bakeId))
+        if contractId is not None:
+            assert isinstance(contractId, (int, long)), "Expecting %s for contractId, got %s" % (int, type(contractId))
         c = self.conn.cursor()
         statements = ["SELECT rowid, * from bake"]
         args = []
@@ -153,12 +168,21 @@ class DBManager(object):
         c.execute("SELECT * from product")
         return c.fetchall()
 
+    def getContract(self, contractId):
+        assert isinstance(contractId, int)
+        c = self.conn.cursor()
+        c.execute("SELECT * from contract WHERE id = ?", (contractId,))
+        return self.toDisplayContract(c.fetchone())
+
     def getUser(self, userId):
+        assert isinstance(userId, int)
         c = self.conn.cursor()
         c.execute("SELECT * from user WHERE id = ?", (userId,))
         return c.fetchone()
 
     def register(self, fields, d):
+        assert isinstance(fields, (list, tuple))
+        assert isinstance(d, dict)
         c = self.conn.cursor()
         query = "INSERT INTO user (%s) VALUES (%s)" % (", ".join(fields), ", ".join(['?' for k in fields]))
         params = [d[k] for k in fields]
@@ -167,6 +191,17 @@ class DBManager(object):
         except sqlite3.IntegrityError:
             raise EmailAlreadyExists(fields)
         return c.lastrowid
+
+    def updateRegistration(self, userId, fields, d):
+        assert isinstance(userId, int)
+        assert isinstance(fields, (list, tuple))
+        assert isinstance(d, dict)
+        c = self.conn.cursor()
+        pairs = ["%s = %s" % (k, '?') for k in fields]
+        query = "UPDATE user SET %s WHERE id = ?" % ", ".join(pairs)
+        params = [d[k] for k in fields]
+        params.append(userId)
+        c.execute(query, params)
 
     def setUserMailing(self, user, mailing):
         assert isinstance(mailing, bool), "Expecting %s for mailing param, got %s" % (bool, type(mailing))
@@ -196,19 +231,27 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("DELETE FROM bakeorder WHERE userid = ? AND bakeid = ?", (user_id, bake_id))
 
-    def deleteAdhesionOrders(self, user_id):
-        # can only delete orders when contract has not been assigned
+    def deleteAdhesionOrders(self, user_id, contractId=None):
         assert isinstance(user_id, int)
         c = self.conn.cursor()
-        c.execute("DELETE FROM adhesionorder WHERE user_id = ? AND contract_id is null", (user_id,))
+        if contractId is None:
+            c.execute("DELETE FROM adhesionorder WHERE user_id = ? AND contract_id is null", (user_id,))
+        else:
+            c.execute("DELETE FROM adhesionorder WHERE user_id = ? AND contract_id = ?", (user_id, contractId))
 
-    def addAdhesionOrder(self, user_id, product_id, qty):
+    def addAdhesionOrder(self, user_id, product_id, qty, contractId=None):
         # can only add orders when contract has not been assigned
         assert isinstance(user_id, int)
         assert isinstance(product_id, int)
         assert isinstance(qty, int)
         c = self.conn.cursor()
-        c.execute("INSERT INTO adhesionorder (user_id, productid, quantity) VALUES (?, ?, ?)", (user_id, product_id, qty))
+        fields = ['user_id', 'productid', 'quantity']
+        values = [user_id, product_id, qty]
+        if contractId is not None:
+            fields.append("contract_id")
+            values.append(contractId)
+        placeholders = ['?'] * len(fields)
+        c.execute("INSERT INTO adhesionorder (%s) VALUES (%s)" % (", ".join(fields), ", ".join(placeholders)), values)
 
     def addBakeOrder(self, user_id, bake_id, product_id, qty):
         assert isinstance(user_id, int)
@@ -223,3 +266,8 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("UPDATE user SET email_confirm_time = datetime('now') WHERE id = ?", (user_id,))
         self.conn.commit()
+
+    def getAdhesionOrders(self, userId, contractId):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM adhesionorder WHERE contract_id = ? AND user_id = ?", (contractId, userId))
+        return c.fetchall()

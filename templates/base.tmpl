@@ -1,7 +1,8 @@
 #encoding utf-8
 <html>
-
 <head>
+#block head
+#end block
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
 <title>Pancito</title>
 #set printSty = $params.getfirst('print')
@@ -21,6 +22,28 @@ h1, h2 {
 font-weight: normal;
 }
 
+td.adhesionorder {
+border-bottom: 1px solid #AAAAAA;
+}
+.adhesionorder td{
+font-size: .8em;
+}
+
+tr.odd1 td {
+background-color: #DFDFDF;
+}
+.adhesionorder .title {
+font-size: .8em;
+font-weight: bold;
+padding: 1em;
+}
+
+table.adhesionorder {
+	width: 100%;
+border-collapse: separate;
+border-spacing: 0
+}
+
 table.order {
 	width: 100%;
 border-collapse: separate;
@@ -32,8 +55,9 @@ border-bottom: 1px solid #AAAAAA;
 padding: 1em;
 }
 
-table.order td.submit {
+table.order td.submit, table.adhesionorder td.submit {
 background-color: #DFDFDF;
+padding: 1em;
 }
 
 table.poll {
@@ -160,7 +184,6 @@ $error
 #end if
 
 #block content
-
 #end block
 </body>
 

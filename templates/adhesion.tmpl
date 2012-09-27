@@ -1,0 +1,93 @@
+#encoding utf-8
+#import base
+#extends base.base
+
+#def head
+#if $success
+<meta http-equiv="refresh" content="0; /contract?u=$user.id&c=$params.getfirst('c')&t=$params.getfirst('t')">
+#end if
+#end def
+
+#def content
+#set $admin = $params.getfirst('admin')
+#if not($success or $error)
+#if $admin
+<h1>Commandes de ${user.name}</h1>
+#else
+<p class="info">Vous êtes identifié en tant
+que «&nbsp;$user.name&nbsp;». Voici la liste
+des distributions pour la saison pré-remplie
+avec vos choix hebdomadaires.  Si vous
+souhaitez personnaliser votre calendrier de
+distribution, veuillez faire les
+modifications nécessaires.  Cliquez ensuite
+sur le bouton <i>Enregistrer</i> pour valider
+votre adhésion.</p>
+#end if
+#elif $success
+<div class="success">
+Votre planning de distribution a été
+enregistré.  Le contrat d'adhésion est en
+cours de chargement, veuillez l'imprimer, le
+lire attentivement et le renvoyer signé avec
+le paiement correspondant.  Merci!
+</div>
+#end if
+
+<form method="POST">
+  <div class="main">
+    <div class="content">
+      <table class="adhesionorder">
+  #for $i, $bake in enumerate($bakes)
+  #import datetime
+  #set active = ($bake.bakedatetime + datetime.timedelta(hours=12)) > $now or $admin
+<tr class="odd${i % 2}">
+<td class="adhesionorder title">
+  #if $active
+  <input type="hidden" name="sb" value="$bake.rowid">
+  #end if
+  #set $orders = $bake.orders or $adhesionOrders
+$bake.bakedate.strftime("%A %d %B %Y")
+</td>
+<td class="adhesionorder">
+<table class="products">
+        #for $j, $product in enumerate($products)
+        #set $order = $orders[$j]
+<tr>
+          <td>
+            <i>
+            $product.name
+            </i>
+</td>
+<td>
+            #if $order
+            #set $qty = $order.quantity
+            #else
+            #set $qty = 0
+            #end if
+            #if $active
+            <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
+            #else
+            <span class="quantity">$qty</span>
+            #end if
+          </td>
+</tr>
+        #end for
+</table>
+</td>
+        </tr>
+  #end for
+        #if $active
+        <tr>
+          <td class="submit" colspan=2>
+            <div style="text-align: right">
+              <input type="submit" value="Enregistrer">
+            </div>
+          </td>
+        </tr>
+        #end if
+      </table>
+    </div>
+  </div>
+</form>
+#end def

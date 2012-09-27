@@ -5,6 +5,6 @@
 	"module": "pancito:application",
 	"http-socket": ":8080",
 	"pythonpath": [".", "templates"],
-        "touch-reload": ["pancito/__init__.py", "pancito/db.py", "templates/base.py", "pancito/mail.py", "pancito.json"]
+        "touch-reload": ["pancito/__init__.py", "pancito/db.py", "templates/base.py", "pancito/mail.py", "pancito/pdfwriter.py", "pancito.json"]
     }
 }
