@@ -50,6 +50,9 @@ class ContractGenerator:
         if not os.path.exists("/usr/bin/libreoffice"):
             raise Exception("Cannot find libreoffice")
 
+        if not os.path.exists("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"):
+            raise Exception("Arial font not found, please install ttf-mscorefonts-installer")
+
         cmd = ["libreoffice", "--headless", "--invisible", "--convert-to", "pdf", "--outdir", tmpdir, tmpfile]
         p = subprocess.Popen(cmd)
         sc = p.wait()
