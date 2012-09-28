@@ -53,11 +53,11 @@ class ContractGenerator:
         if not os.path.exists("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"):
             raise Exception("Arial font not found, please install ttf-mscorefonts-installer")
 
-        cmd = ["libreoffice", "--headless", "--invisible", "--convert-to", "pdf", "--outdir", tmpdir, tmpfile]
-        p = subprocess.Popen(cmd)
+        cmd = ["/usr/bin/libreoffice", "--headless", "--invisible", "--convert-to", "pdf", "--outdir", tmpdir, tmpfile]
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         sc = p.wait()
         if sc != 0:
-            raise Exception("Command returned status %s: %s" % (sc, cmd))
+            raise Exception("Command returned status %s: %s.\nOutput:\n%s\nError:\n%s" % (sc, cmd, p.stdout.read(), p.stderr.read()))
 
         os.unlink(tmpfile)
         self.createAdhesion(user['id'], contract['id'], orderAmount)
