@@ -39,7 +39,7 @@ class ContractGenerator:
 
         print "Writing contract for", user['name']
         rw_database = RWDatabase(fs=lfs)
-        handler = rw_database.get_handler('data/model.odt')
+        handler = rw_database.get_handler(os.path.join(pancito.datadir, 'model.odt'))
         document = stl_to_odt(handler, info)
         handler = ODTFile(string=document)
         tmpfile = tempfile.mktemp(".odt")
