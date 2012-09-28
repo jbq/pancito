@@ -4,10 +4,11 @@ import Cheetah.Template
 import sqlite3, hashlib
 import db, mail, pdfwriter
 import traceback, subprocess
-
+import log
 import locale
+import syslog
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-
+syslog.openlog("pancito", syslog.LOG_PID)
 root = os.path.dirname(os.path.dirname(__file__))
 datadir = os.path.join(root, 'data')
 with open(os.path.join(root, "secret")) as f:
@@ -74,16 +75,13 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             self._startResponse(self.status, self.headers)
             return value
         except BadRequest:
-            traceback.print_exc()
+            log.log_exc()
             self._startResponse("400 Bad Request", [('Content-Type', 'text/html; charset=utf-8')])
-            return "<h1>Requête incorrecte</h1>"
-        #try:
-        #except:
-        #    import cgitb
-        #    traceback.print_tb()
-        #    self._startResponse("500 Internal Server Error", [('Content-Type', 'text/html')])
-        #    return ""
-        #    return cgitb.html(sys.exc_info())
+            return "<h1>Requête incorrecte</h1><p>L'équipe technique a été informée du problème, veuillez renouveler l'opération dans quelques minutes.</p>"
+        except:
+            log.log_exc()
+            self._startResponse("500 Internal Server Error", [('Content-Type', 'text/html')])
+            return "<h1>Erreur du serveur</h1><p>L'équipe technique a été informée du problème, veuillez renouveler l'opération dans quelques minutes.</p>"
 
     def getQueryParameters(self):
         if self.__params is None:
