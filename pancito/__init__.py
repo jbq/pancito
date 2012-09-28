@@ -48,7 +48,7 @@ def verifyToken(user, token, extraArgs=None):
         raise BadRequest("Missing token")
 
     if token != genToken(user, extraArgs):
-        raise BadRequest("Token mismatch")
+        raise BadRequest("Token mismatch for user %s" % user['id'])
 
 def displayAmount(v):
     assert isinstance(v, int)
@@ -76,10 +76,12 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             return value
         except BadRequest:
             log.log_exc()
+            log.notice("Environ: %s" % repr(self.environ))
             self._startResponse("400 Bad Request", [('Content-Type', 'text/html; charset=utf-8')])
             return "<h1>Requête incorrecte</h1><p>L'équipe technique a été informée du problème, veuillez renouveler l'opération dans quelques minutes.</p>"
         except:
             log.log_exc()
+            log.notice("Environ: %s" % repr(self.environ))
             self._startResponse("500 Internal Server Error", [('Content-Type', 'text/html')])
             return "<h1>Erreur du serveur</h1><p>L'équipe technique a été informée du problème, veuillez renouveler l'opération dans quelques minutes.</p>"
 
