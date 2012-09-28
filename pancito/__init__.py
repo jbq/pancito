@@ -14,7 +14,7 @@ with open(os.path.join(root, "secret")) as f:
     secretKey = f.read().rstrip()
 
 def opendb():
-    dbpath = os.path.join(datadir, 'pancito.db')
+    dbpath = os.path.join(datadir, 'db/pancito.db')
 
     if not(os.path.exists(dbpath)):
         newDB = True
