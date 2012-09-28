@@ -3,7 +3,11 @@
 #extends base.base
 
 #def field(k)
+#if $user
 ${params.getfirst(k) or $user[$k]}
+#else
+${params.getfirst(k)}
+#end if
 #end def
 
 #def content
@@ -108,7 +112,11 @@ $field('phone')
 #if $success
             ${params.getfirst("product.%s" % $product.id)}
 #else
+#if $orders
             <input type="text" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or $orders[$i].quantity}">
+#else
+            <input type="text" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id)}">
+#end if
 #end if
           </td>
         </tr>
