@@ -38,8 +38,23 @@ Merci!</b>
 </div>
 #end if
 
+<div class="main">
+<h2>Prix du pain</h2>
+<div class="content">
+<table class='order'>
+#for $j, $product in enumerate($products)
+<tr>
+<td>$product.name</td>
+<td>$displayAmount($product.itemprice) € l'unité</td>
+</tr>
+#end for
+</table>
+</div>
+</div>
+
 <form method="POST">
   <div class="main">
+<h2>Calendrier de distribution</h2>
     <div class="content">
       <table class="adhesionorder">
   #for $i, $bake in enumerate($bakes)
