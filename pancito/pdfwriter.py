@@ -59,4 +59,6 @@ class ContractGenerator:
         if sc != 0:
             raise Exception("Command returned status %s: %s" % (sc, cmd))
 
+        os.unlink(tmpfile)
+        self.createAdhesion(user['id'], contract['id'], orderAmount)
         return os.path.join(tmpdir, os.path.basename(tmpfile).replace('.odt', '.pdf'))

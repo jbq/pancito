@@ -1,5 +1,5 @@
 # coding=utf-8
-import os.path, StringIO, sys, operator, datetime, cgi
+import os.path, StringIO, sys, operator, datetime, cgi, shutil
 import Cheetah.Template
 import sqlite3, hashlib
 import db, mail, pdfwriter
@@ -82,7 +82,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         except:
             log.log_exc()
             log.notice("Environ: %s" % repr(self.environ))
-            self._startResponse("500 Internal Server Error", [('Content-Type', 'text/html')])
+            self._startResponse("500 Internal Server Error", [('Content-Type', 'text/html; charset=utf-8')])
             return "<h1>Erreur du serveur</h1><p>L'équipe technique a été informée du problème, veuillez renouveler l'opération dans quelques minutes.</p>"
 
     def getQueryParameters(self):
@@ -303,8 +303,17 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             self.addHeader("Content-Type", "application/pdf")
             self.addHeader("Content-Disposition", "attachment; filename=Contrat Pancito.pdf")
-            with open(self.gencontract(user, contract)) as f:
-                return f.read()
+            contractFile = self.gencontract(user, contract)
+
+            with open(contractFile) as f:
+                contractData = f.read()
+
+            contractDir = os.path.join(datadir, "Contrats", str(contract['id']))
+            if not os.path.exists(contractDir):
+                os.makedirs(contractDir)
+            shutil.move(contractFile, os.path.join(contractDir, "%s Contrat %s.pdf" % (datetime.date.today().strftime("%Y-%m-%d"), user['name'])))
+            self.conn.commit()
+            return contractData
 
         if uri == "/adhesion":
             template = self.getTemplate("adhesion")
@@ -330,6 +339,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template.adhesionOrders = self.getAdhesionOrders(userId, contractId)
             if len(template.adhesionOrders) == 0:
                 raise Exception("No orders for contract %s and user %s" % (contractId, userId))
+            template.adhesion = self.getAdhesion(userId, contractId)
 
             if method == "GET":
                 editedBakes = list(self.getBakes(contractId))

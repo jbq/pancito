@@ -34,6 +34,7 @@ CREATE TABLE adhesion (
     contract_id int not null,
     user_id int not null,
     creation_time datetime not null default current_timestamp,
+    amount int not null,
     paperwork_verified datetime,
     unique(contract_id, user_id)
 )''',
@@ -83,7 +84,15 @@ class DBManager(object):
     def getBakeOrdersByUserId(self, bakeId):
         return self.getBakeOrdersByField(bakeId, "userid", "productid")
 
+    def toDisplayAdhesion(self, adhesion):
+        return self.toDisplayCreationTime(adhesion)
+
     def displayOrder(self, order):
+        return self.toDisplayCreationTime(order)
+
+    def toDisplayCreationTime(self, order):
+        if order is None:
+            return None
         order = dict(order)
         ct = datetime.datetime.strptime(order['creation_time'], "%Y-%m-%d %H:%M:%S")
         ct = ct.replace(tzinfo=pytz.timezone('UTC'))
@@ -240,7 +249,6 @@ class DBManager(object):
             c.execute("DELETE FROM adhesionorder WHERE user_id = ? AND contract_id = ?", (user_id, contractId))
 
     def addAdhesionOrder(self, user_id, product_id, qty, contractId=None):
-        # can only add orders when contract has not been assigned
         assert isinstance(user_id, int)
         assert isinstance(product_id, int)
         assert isinstance(qty, int)
@@ -252,6 +260,15 @@ class DBManager(object):
             values.append(contractId)
         placeholders = ['?'] * len(fields)
         c.execute("INSERT INTO adhesionorder (%s) VALUES (%s)" % (", ".join(fields), ", ".join(placeholders)), values)
+
+    def createAdhesion(self, user_id, contractId, amount):
+        assert isinstance(user_id, int)
+        assert isinstance(contractId, int)
+        c = self.conn.cursor()
+        fields = ['user_id', 'contract_id', 'amount']
+        values = [user_id, contractId, amount]
+        placeholders = ['?'] * len(fields)
+        c.execute("INSERT INTO adhesion (%s) VALUES (%s)" % (", ".join(fields), ", ".join(placeholders)), values)
 
     def addBakeOrder(self, user_id, bake_id, product_id, qty):
         assert isinstance(user_id, int)
@@ -271,3 +288,8 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("SELECT * FROM adhesionorder WHERE contract_id = ? AND user_id = ?", (contractId, userId))
         return c.fetchall()
+
+    def getAdhesion(self, userId, contractId):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM adhesion WHERE contract_id = ? AND user_id = ?", (contractId, userId))
+        return self.toDisplayAdhesion(c.fetchone())

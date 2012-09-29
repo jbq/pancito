@@ -3,7 +3,7 @@
 #extends base.base
 
 #def head
-#if $success
+#if $success and $adhesion is None
 <meta http-equiv="refresh" content="0; /contract?u=$user.id&c=$params.getfirst('c')&t=$params.getfirst('t')">
 #end if
 #end def
@@ -15,22 +15,26 @@
 <h1>Commandes de ${user.name}</h1>
 #else
 <p class="info">Vous êtes identifié en tant
-que «&nbsp;$user.name&nbsp;». Voici la liste
-des distributions pour la saison pré-remplie
-avec vos choix hebdomadaires.  Si vous
-souhaitez personnaliser votre calendrier de
-distribution, veuillez faire les
-modifications nécessaires.  Cliquez ensuite
-sur le bouton <i>Enregistrer</i> pour valider
-votre adhésion.</p>
+que «&nbsp;$user.name&nbsp;».
+#if $adhesion is None
+Voici la liste des distributions pour la saison pré-remplie avec vos choix
+hebdomadaires.  Si vous souhaitez personnaliser votre calendrier de
+distribution, veuillez faire les modifications nécessaires.  Cliquez ensuite
+sur le bouton <i>Enregistrer</i> pour valider votre adhésion.
+#else
+Voici votre calendrier de distribution.  Faites les modifications nécessaires, puis cliquez
+sur le bouton <i>Enregistrer</i>.
+#end if
+</p>
 #end if
 #elif $success
 <div class="success">
-Votre planning de distribution a été
-enregistré.  Le contrat d'adhésion est en
-cours de chargement, veuillez l'imprimer, le
-lire attentivement et le renvoyer signé avec
-le paiement correspondant.  Merci!
+Votre calendrier de distribution a été enregistré.
+#if $adhesion is None
+<b>Le contrat d'adhésion est en cours de chargement, veuillez le lire
+attentivement, l'imprimer et le renvoyer signé avec le paiement correspondant.
+Merci!</b>
+#end if
 </div>
 #end if
 
