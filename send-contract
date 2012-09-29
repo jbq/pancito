@@ -19,4 +19,4 @@ c.execute("SELECT * FROM user WHERE id = ?", (userId,))
 user = c.fetchone()
 with open(pdfFile) as f:
     pdfData = f.read()
-pancito.mail.sendContract(user, contract, pdfData)
+pancito.mail.writeMail(user, pancito.mail.buildContractEmail(user, contract, pdfData))
