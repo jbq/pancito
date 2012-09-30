@@ -5,12 +5,8 @@ import pancito.mail
 import sys
 
 template = "data/reminder.tmpl"
-maildir = "tmp/mail"
-if len(os.listdir(maildir)) > 0:
-    raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
-
 conn = pancito.opendb()
 c = conn.cursor()
 c.execute("SELECT * FROM user WHERE ismailing AND id NOT IN (SELECT userid FROM bakeorder WHERE bakeid = ?)", (int(sys.argv[1]),))
 for user in c.fetchall():
-    pancito.mail.writeMail(user, maildir, template)
+    pancito.mail.writeMail(user, pancito.mail.mail_template(user, template))

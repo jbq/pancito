@@ -9,6 +9,19 @@ import email.mime.text
 import email.mime.application
 import subprocess
 
+_maildir = None
+def maildir():
+    if _maildir is not None:
+        return _maildir
+
+    globals()['_maildir'] = "tmp/mail"
+    if not(os.path.exists(_maildir)):
+        os.makedirs(_maildir)
+    else:
+        if len(os.listdir(_maildir)) > 0:
+            raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
+    return _maildir
+
 def encodeHeader(v):
     return email.header.Header(v, 'utf-8').encode()
 
@@ -26,14 +39,7 @@ def mail_template(user, t):
 def writeMail(user, mailData):
     assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
 
-    maildir = "tmp/mail"
-    if not(os.path.exists(maildir)):
-        os.makedirs(maildir)
-    else:
-        if len(os.listdir(maildir)) > 0:
-            raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
-
-    with open(os.path.join(maildir, "%02u" % user['id']), "w") as f:
+    with open(os.path.join(maildir(), "%02u" % user['id']), "w") as f:
         f.write(mailData)
 
 def mail_template_with_pdf_attachment(user, t, pdfData):

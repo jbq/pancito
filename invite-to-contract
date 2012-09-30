@@ -5,12 +5,6 @@ import sys
 import Cheetah.Template
 
 template = os.path.join(pancito.datadir, "mail/inviteToContract.tmpl")
-maildir = "tmp/mail"
-if not(os.path.exists(maildir)):
-    os.makedirs(maildir)
-if len(os.listdir(maildir)) > 0:
-    raise Exception("tmp/mail is not empty, aborting to prevent side effects.")
-
 contractId = int(sys.argv[1])
 conn = pancito.opendb()
 c = conn.cursor()
@@ -24,4 +18,4 @@ for user in c.fetchall():
     t = Cheetah.Template.Template(file=template)
     t.registrationUrl = "http://m.pancito.fr/register?u=%s&c=%s&t=%s" % (user['id'], contractId, pancito.genToken(user, contractId))
     t.contract = contract
-    pancito.mail.writeMail(user, maildir, t)
+    pancito.mail.writeMail(user, pancito.mail.mail_template(user, t))
