@@ -210,7 +210,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                     p = params.getfirst(f)
                     if p is None:
                         return None
-                    v = p.decode('utf8')
+                    v = p.strip().decode('utf8')
                     if v is None:
                         return None
                     d[f] = v
