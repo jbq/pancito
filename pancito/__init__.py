@@ -227,17 +227,21 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                 if template.error is None:
                     try:
-                        if template.user is None:
+                        if userId is None:
                             email = True
                             rowid = self.register(fields, d)
                             user = self.getUser(rowid)
                         else:
                             if template.user['email'] != d['email']:
                                 email = True
+                                self.resetEmail(userId)
                             else:
                                 email = False
-                            user = template.user
-                            self.updateRegistration(user['id'], fields, d)
+
+                            self.updateRegistration(userId, fields, d)
+                            # Fetch user again from db to have updated fields
+                            # and compute proper token
+                            user = self.getUser(userId)
 
                         self.deleteAdhesionOrders(user['id'], contractId)
                         for product in template.products:
@@ -247,14 +251,16 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                                 qty = 0
                             self.addAdhesionOrder(user['id'], product['id'], qty, contractId)
 
+                        if userId is not None and contractId is not None:
+                            adhesionUri = '/adhesion?u=%s&c=%s&t=%s' % (userId, contractId, genToken(user, contractId))
+
                         if email:
-                            cmd = ["sendmail", "-it"]
-                            p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-                            p.stdin.write(mail.mail_template(user, Cheetah.Template.Template(file="%s/mail/registrationEmail.tmpl" % datadir)))
-                            p.stdin.close()
-                            sc = p.wait()
-                            if sc != 0:
-                                raise Exception("Command returned status code %s: %s" % (sc, cmd))
+                            t = Cheetah.Template.Template(file="%s/mail/registrationEmail.tmpl" % datadir)
+                            if userId is not None and contractId is not None:
+                                t.emailConfirmationUrl = 'http://m.pancito.fr%s&emailConfirmed=1' % adhesionUri
+                            else:
+                                t.emailConfirmationUrl = 'http://m.pancito.fr/emailConfirmation?userId=%s&t=%s' % (user['id'], genToken(user))
+                            mail.sendMail(mail.mail_template(user, t))
 
                         self.conn.commit()
                         if email:
@@ -266,7 +272,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                         if email is False and userId is not None and contractId is not None:
                             # No need to confirm email, go to adhesion form directly
                             self.status = "302 Moved Temporarily"
-                            self.addHeader("Location", '/adhesion?u=%s&c=%s&t=%s' % (userId, contractId, genToken(user, contractId)))
+                            self.addHeader("Location", adhesionUri)
+                            return
 
                     except db.EmailAlreadyExists:
                         template.error = "L'adresse email que vous avez renseigné existe déjà.  L'inscription a déjà été effectuée."
@@ -317,21 +324,20 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             return contractData
 
         if uri == "/adhesion":
-            template = self.getTemplate("adhesion")
-            userId = None
-            contractId = None
-
             try:
                 userId = int(params.getfirst('u'))
-            except :
-                pass
+            except Exception, e:
+                raise BadRequest(repr(e))
 
             try:
                 contractId = int(params.getfirst('c'))
-            except :
-                pass
+            except Exception, e:
+                raise BadRequest(repr(e))
 
+            template = self.getTemplate("adhesion")
             self.conn = opendb()
+            if params.getfirst("emailConfirmed") is not None:
+                self.confirmEmail(userId)
 
             template.user = self.getUser(userId)
             # contract id is included in token

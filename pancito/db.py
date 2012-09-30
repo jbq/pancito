@@ -278,6 +278,12 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("INSERT INTO bakeorder (userid, bakeid, productid, quantity) VALUES (?, ?, ?, ?)", (user_id, bake_id, product_id, qty))
 
+    def resetEmail(self, user_id):
+        assert isinstance(user_id, int)
+        c = self.conn.cursor()
+        c.execute("UPDATE user SET email_confirm_time = NULL WHERE id = ?", (user_id,))
+        self.conn.commit()
+
     def confirmEmail(self, user_id):
         assert isinstance(user_id, int)
         c = self.conn.cursor()
