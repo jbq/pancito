@@ -19,8 +19,8 @@ que «&nbsp;$user.name&nbsp;».
 #if $adhesion is None
 Voici la liste des distributions pour la saison pré-remplie avec vos choix
 hebdomadaires.  Si vous souhaitez personnaliser votre calendrier de
-distribution, veuillez faire les modifications nécessaires.  Cliquez ensuite
-sur le bouton <i>Enregistrer</i> pour valider votre adhésion.
+distribution, veuillez faire les modifications nécessaires.  <b>Cliquez ensuite
+sur le bouton <i>Enregistrer</i> pour valider votre adhésion.</b>
 #else
 Voici votre calendrier de distribution.  Faites les modifications nécessaires, puis cliquez
 sur le bouton <i>Enregistrer</i>.
@@ -54,6 +54,9 @@ Merci!</b>
 
 <form method="POST">
   <div class="main">
+    <div style="float: right; padding: 1em">
+      <input class="submit" type="submit" value="Enregistrer">
+    </div>
 <h2>Calendrier de distribution</h2>
     <div class="content">
       <table class="adhesionorder">
@@ -96,15 +99,13 @@ $bake.bakedate.strftime("%A %d %B %Y")
 </td>
         </tr>
   #end for
-        #if $active
         <tr>
           <td class="submit" colspan=2>
             <div style="text-align: right">
-              <input type="submit" value="Enregistrer">
+              <input class="submit" type="submit" value="Enregistrer">
             </div>
           </td>
         </tr>
-        #end if
       </table>
     </div>
   </div>
