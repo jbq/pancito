@@ -311,7 +311,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             contractDir = os.path.join(datadir, "Contrats", str(contract['id']))
             if not os.path.exists(contractDir):
                 os.makedirs(contractDir)
-            shutil.move(contractFile, os.path.join(contractDir, "%s Contrat %s.pdf" % (datetime.date.today().strftime("%Y-%m-%d"), user['name'])))
+            shutil.move(contractFile, os.path.join(contractDir, "%s Contrat %s.pdf" % (datetime.date.today().strftime("%Y-%m-%d"), user['name'].encode('utf-8'))))
             mail.sendMail(mail.buildContractEmail(user, contract, contractData))
             self.conn.commit()
             return contractData
