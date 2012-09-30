@@ -33,7 +33,7 @@ notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
     <div class="content">
       <table class="order">
         <tr>
-          <td>Nom complet</td>
+          <td width="30%">Nom complet</td>
           <td>
 #if $success
           $field('name')
@@ -63,7 +63,7 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
           <pre>$field('address')
 $field('postcode') $field('locality')</pre>
 #else
-            <textarea name='address'>$field('address')</textarea>
+            <textarea cols='40' name='address'>$field('address')</textarea>
         </td>
         </tr>
         <tr>
