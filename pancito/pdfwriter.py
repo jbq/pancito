@@ -37,7 +37,6 @@ class ContractGenerator:
         info.order = " et ".join(orderdisplays)
         info.balance = pancito.displayAmount(orderAmount - user['balance'])
 
-        print "Writing contract for", user['name']
         rw_database = RWDatabase(fs=lfs)
         handler = rw_database.get_handler(os.path.join(pancito.datadir, 'model.odt'))
         document = stl_to_odt(handler, info)
