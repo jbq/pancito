@@ -54,9 +54,11 @@ Merci!</b>
 
 <form method="POST">
   <div class="main">
+#if not $success
     <div style="float: right; padding: 1em">
       <input class="submit" type="submit" value="Enregistrer">
     </div>
+#end if
 <h2>Calendrier de distribution</h2>
     <div class="content">
       <table class="adhesionorder">
@@ -87,10 +89,10 @@ $bake.bakedate.strftime("%A %d %B %Y")
             #else
             #set $qty = 0
             #end if
-            #if $active
+            #if $active and not $success
             <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
             #else
-            <span class="quantity">$qty</span>
+            &nbsp; <span class="quantity">$qty</span>
             #end if
           </td>
 </tr>
@@ -99,6 +101,7 @@ $bake.bakedate.strftime("%A %d %B %Y")
 </td>
         </tr>
   #end for
+#if not $success
         <tr>
           <td class="submit" colspan=2>
             <div style="text-align: right">
@@ -106,6 +109,7 @@ $bake.bakedate.strftime("%A %d %B %Y")
             </div>
           </td>
         </tr>
+#end if
       </table>
     </div>
   </div>
