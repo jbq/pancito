@@ -50,7 +50,7 @@ def mail_template_with_pdf_attachment(user, t, pdfData):
     msg['From'] = "Jean-Baptiste Quenot <jbq@pancito.fr>"
     msg['To'] = t.email
     msg['Subject'] = t.encodeHeader(t.subject)
-    msg['Cci'] = "jbq+adhesion@pancito.fr"
+    msg['Bcc'] = "jbq+adhesion@pancito.fr"
     pdf.add_header('Content-Disposition', 'attachment', filename='Contrat Pancito.pdf')
     return msg.as_string()
 
