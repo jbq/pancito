@@ -38,7 +38,7 @@ notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
 #if $success
           $field('name')
 #else
-            <input type='text' name='name' value="$field('name')">
+            <input type='text' name='name' size="40" value="$field('name')">
             <span class="note">Par exemple: <i>M. et Mme Durand</i>, <i>Alain
 Maubert</i>, <i>Famille Truchaud</i>…</span>
 #end if
@@ -50,7 +50,7 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
 #if $success
           <tt>$field('email')</tt>
 #else
-            <input type='text' name='email' value="$field('email')">
+            <input type='text' name='email' size="40" value="$field('email')">
             <span class="note">Vous allez recevoir des instructions à cette adresse pour
             compléter votre inscription</span>
 #end if
@@ -113,9 +113,9 @@ $field('phone')
             ${params.getfirst("product.%s" % $product.id)}
 #else
 #if $orders
-            <input type="text" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or $orders[$i].quantity}">
+            <input type="text" size="2" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or $orders[$i].quantity}">
 #else
-            <input type="text" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id)}">
+            <input type="text" size="2" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id)}">
 #end if
 #end if
           </td>
