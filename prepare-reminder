@@ -1,12 +1,19 @@
 #! /usr/bin/python
 import os.path
 import pancito
-import pancito.mail
+import pancito.mail, pancito.db
 import sys
+import Cheetah.Template
 
-template = "data/reminder.tmpl"
+template = "data/mail/reminder.tmpl"
 conn = pancito.opendb()
 c = conn.cursor()
-c.execute("SELECT * FROM user WHERE ismailing AND id NOT IN (SELECT userid FROM bakeorder WHERE bakeid = ?)", (int(sys.argv[1]),))
+db = pancito.db.DBManager(conn)
+bakeId = int(sys.argv[1])
+c.execute("SELECT * FROM user WHERE ismailing AND id NOT IN (SELECT userid FROM bakeorder WHERE bakeid = ?)", (bakeId,))
+
 for user in c.fetchall():
-    pancito.mail.writeMail(user, pancito.mail.mail_template(user, template))
+    t = Cheetah.Template.Template(file=template)
+    t.bake = db.getBake(bakeId)
+    t.contract = db.getContract(1)
+    pancito.mail.writeMail(user, pancito.mail.mail_template(user, t))

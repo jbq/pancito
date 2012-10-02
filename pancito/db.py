@@ -177,6 +177,12 @@ class DBManager(object):
         c.execute("SELECT * from product")
         return c.fetchall()
 
+    def getBake(self, bakeId):
+        assert isinstance(bakeId, int)
+        c = self.conn.cursor()
+        c.execute("SELECT rowid, * from bake WHERE rowid = ?", (bakeId,))
+        return self.toDisplayBake(c.fetchone())
+
     def getContract(self, contractId):
         assert isinstance(contractId, int)
         c = self.conn.cursor()
