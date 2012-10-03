@@ -38,7 +38,11 @@
 			#end for
 			<td>
 #if not $printSty
-			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Change order</a>
+			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
+#set contractId = $params.getfirst("c")
+#if contractId
+			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$genToken($user, $contractId)&amp;admin=1">Registration</a>
+#end if
 #end if
 			</td>
 		</tr>
