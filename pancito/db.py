@@ -216,7 +216,10 @@ class DBManager(object):
         query = "UPDATE user SET %s WHERE id = ?" % ", ".join(pairs)
         params = [d[k] for k in fields]
         params.append(userId)
-        c.execute(query, params)
+        try:
+            c.execute(query, params)
+        except sqlite3.IntegrityError:
+            raise EmailAlreadyExists(fields)
 
     def setUserMailing(self, user, mailing):
         assert isinstance(mailing, bool), "Expecting %s for mailing param, got %s" % (bool, type(mailing))
