@@ -222,7 +222,9 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                 if d is None:
                     template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
-                if not checkProducts():
+                elif d['email'].find('@') == -1:
+                    template.error = "Veuillez saisir une adresse email valide"
+                elif not checkProducts():
                     template.error = "Veuillez préciser votre commande hebdomadaire avec au moins un produit!"
 
                 if template.error is None:
