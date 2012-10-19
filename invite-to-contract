@@ -13,7 +13,7 @@ db = pancito.db.DBManager(conn)
 contract = db.toDisplayContract(c.fetchone())
 for field in ('startdate', 'enddate'):
     contract[field] = contract[field].strftime("%d %B %Y")
-c.execute("SELECT * FROM user WHERE ismailing")
+c.execute("SELECT * FROM user WHERE ismailing and NOT ismember")
 for user in c.fetchall():
     t = Cheetah.Template.Template(file=template)
     t.registrationUrl = "http://m.pancito.fr/register?u=%s&c=%s&t=%s" % (user['id'], contractId, pancito.genToken(user, contractId))
