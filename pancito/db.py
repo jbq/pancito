@@ -238,9 +238,9 @@ class DBManager(object):
         c.execute(" ".join(clauses), params)
         return c.fetchall()
 
-    def getUsersWithOrder(self, bakeIds):
+    def getUsersWithOrder(self, bakes):
         c = self.conn.cursor()
-        c.execute("SELECT * from user WHERE id IN (SELECT userid FROM bakeorder WHERE bakeid IN (?))", (", ".join(bakeIds),))
+        c.execute("SELECT * from user WHERE id IN (SELECT userid FROM bakeorder WHERE bakeid IN (%s))" % (", ".join([str(x['rowid']) for x in bakes]),))
         return c.fetchall()
 
     def deleteBakeOrders(self, user_id, bake_id):

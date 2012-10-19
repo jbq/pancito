@@ -138,13 +138,12 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             displayedBakes = list(self.getBakesForIds(displayedBakeIds))
 
             if len(displayedBakes) == 0:
-                displayedBakes = self.getBakes()
+                displayedBakes = list(self.getBakes())
+
+            if displayAllUsers or displayMailedUsers:
                 template.users = self.getUsers(ismailing=displayMailedUsers)
             else:
-                if displayAllUsers or displayMailedUsers:
-                    template.users = self.getUsers(ismailing=displayMailedUsers)
-                else:
-                    template.users = self.getUsersWithOrder(displayedBakeIds)
+                template.users = self.getUsersWithOrder(displayedBakes)
 
             template.bakes = list(self.buildSpecifiedBakesWithOrdersByUser(displayedBakes))
             self.addHeader("Content-Type", "text/html; charset=utf-8")
