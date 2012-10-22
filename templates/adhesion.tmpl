@@ -70,13 +70,18 @@ Merci!</b>
   #if $active
   <input type="hidden" name="sb" value="$bake.rowid">
   #end if
-  #set $orders = $bake.orders or $adhesionOrders
+  #set $orders = $bake.orders
 $bake.bakedate.strftime("%A %d %B %Y")
 </td>
 <td class="adhesionorder">
 <table class="products">
-        #for $j, $product in enumerate($products)
+#for $j, $product in enumerate($products)
+    #if len($orders) > 0
         #set $order = $orders[$j]
+    #else
+        #set $order = None
+    #end if
+        #set $adhesionOrder = $adhesionOrders[$j]
 <tr>
           <td>
             <i>
@@ -84,23 +89,28 @@ $bake.bakedate.strftime("%A %d %B %Y")
             </i>
 </td>
 <td>
-            #if $order
-            #set $qty = $order.quantity
-            #else
-            #set $qty = 0
-            #end if
-            #if $active and not $success
-            <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
-            #else
-            &nbsp; <span class="quantity">$qty</span>
-            #end if
-          </td>
+#if $active and not $success
+    #if $order
+        #set $qty = $order.quantity
+    #else
+        #set $qty = $adhesionOrder.quantity
+    #end if
+    <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
+#else
+    #if $order
+        #set $qty = $order.quantity
+    #else
+        #set $qty = 0
+    #end if
+    &nbsp; <span class="quantity">$qty</span>
+#end if
+  </td>
 </tr>
-        #end for
+#end for
 </table>
 </td>
         </tr>
-  #end for
+#end for
 #if not $success
         <tr>
           <td class="submit" colspan=2>
