@@ -9,7 +9,11 @@
 
 <style type="text/css">
 body {
+#if $printSty
+font: normal normal 12px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+#else
 font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+#end if
 color: white;
 #if not $printSty
 background: #111111 url(http://3.bp.blogspot.com/-g9tyFyMbiHY/T6KwI7gX0VI/AAAAAAAAE_w/pGWBQwVYrrk/s1600/pancito.JPG) repeat scroll top left;
@@ -172,9 +176,11 @@ background-image: url('knobs/Knob%20Cancel.png');
 </head>
 
 <body>
+#if not $printSty
 <a href="http://www.pancito.fr/" style="display: block">
 <img alt="Pancito - boulangerie alternative à Toulouse" height="79px; " id="Header1_headerimg" src="http://1.bp.blogspot.com/-xHAstUDvDqY/UFM1kif9yQI/AAAAAAAAFD8/46JCU4aGkQI/s1600/Headline.png" style="display: block" width="252px; ">
 </a>
+#end if
 
 #if $warning
 <div class="warning">
