@@ -7,10 +7,8 @@ import Cheetah.Template
 template = os.path.join(pancito.datadir, "mail/inviteToContract.tmpl")
 contractId = int(sys.argv[1])
 conn = pancito.opendb()
-c = conn.cursor()
-c.execute("SELECT * FROM contract WHERE id = ?", (contractId,))
 db = pancito.db.DBManager(conn)
-contract = db.toDisplayContract(c.fetchone())
+contract = db.getContract(contractId)
 for field in ('startdate', 'enddate'):
     contract[field] = contract[field].strftime("%d %B %Y")
 c.execute("SELECT * FROM user WHERE ismailing and NOT ismember")

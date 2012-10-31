@@ -1,0 +1,29 @@
+#! /usr/bin/python
+import os.path, sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+import pancito.mail, pancito.db
+import getopt, Cheetah.Template
+
+userFlag = "ismailing"
+contract = None
+options, args = getopt.getopt(sys.argv[1:], "mnc:", ("members", "non-members", "contract="))
+for option, value in options:
+    if option in ("-m", "--members"):
+        userFlag = "ismember"
+    elif option in ("-n", "--non-members"):
+        userFlag = "ismailing AND not ismember"
+    elif option in ("-c", "--contract"):
+        userFlag = "ismember"
+        contractId = int(value)
+        conn = pancito.opendb()
+        db = pancito.db.DBManager(conn)
+        contract = db.getContract(contractId)
+
+template = os.path.join(pancito.datadir, "mail.tmpl")
+conn = pancito.opendb()
+c = conn.cursor()
+c.execute("SELECT * FROM user WHERE %s" % userFlag)
+template = os.path.join(pancito.datadir, "mail/mail.tmpl")
+t = Cheetah.Template.Template(file=template)
+for user in c.fetchall():
+    pancito.mail.writeMail(user, pancito.mail.mail_template(user, t, contract))

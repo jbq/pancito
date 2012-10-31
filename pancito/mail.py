@@ -25,12 +25,15 @@ def maildir():
 def encodeHeader(v):
     return email.header.Header(v, 'utf-8').encode()
 
-def mail_template(user, t):
+def mail_template(user, t, contract=None):
     assert isinstance(t, Cheetah.Template.Template)
     assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
     t.orderUrl = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
     t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
+    if contract is not None:
+        t.adhesionUrl = "http://m.pancito.fr/adhesion?u=%s&c=%s&t=%s" % (user['id'], contract['id'], pancito.genToken(user, contract['id']))
     t.email = user['email']
+    t.user = user
     t.encodeHeader = encodeHeader
     content = unicode(t)
     return content.encode('utf-8')
@@ -62,7 +65,6 @@ def buildContractEmail(user, contract, pdfData):
     t = Cheetah.Template.Template(file=template)
     t.subject = "Contrat pain"
     t.contract = contract
-    t.adhesionUrl = "http://m.pancito.fr/adhesion?u=%s&c=%s&t=%s" % (user['id'], contract['id'], pancito.genToken(user, contract['id']))
     return pancito.mail.mail_template_with_pdf_attachment(user, t, pdfData)
 
 def sendMail(mailData):
