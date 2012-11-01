@@ -74,10 +74,12 @@ border-collapse: separate;
 border-spacing: 0
 }
 table.poll tr td {
+#if $printSty
+border-bottom: 1px solid black;
+font: normal normal 12px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
+#else
 border-bottom: 1px solid white;
-border-bottom-width: 1px;
-border-bottom-style: solid;
-border-bottom-color: white;
+#end if
 padding: 6px;
 }
 table.poll tr td.n {
