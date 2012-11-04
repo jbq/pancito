@@ -44,9 +44,9 @@ def writeMail(user, mailData):
     with open(os.path.join(maildir(), "%02u" % user['id']), "w") as f:
         f.write(mailData)
 
-def mail_template_with_pdf_attachment(user, t, pdfData):
+def mail_template_with_pdf_attachment(user, t, contract, pdfData):
     msg = email.mime.multipart.MIMEMultipart()
-    text = email.mime.text.MIMEText(mail_template(user, t), "plain", "utf-8")
+    text = email.mime.text.MIMEText(mail_template(user, t, contract), "plain", "utf-8")
     pdf = email.mime.application.MIMEApplication(pdfData, "pdf")
     msg.attach(text)
     msg.attach(pdf)
@@ -65,7 +65,7 @@ def buildContractEmail(user, contract, pdfData):
     t = Cheetah.Template.Template(file=template)
     t.subject = "Contrat pain"
     t.contract = contract
-    return pancito.mail.mail_template_with_pdf_attachment(user, t, pdfData)
+    return pancito.mail.mail_template_with_pdf_attachment(user, t, contract, pdfData)
 
 def sendMail(mailData):
     p = subprocess.Popen(["sendmail", "-it"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
