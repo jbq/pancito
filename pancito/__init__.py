@@ -33,7 +33,6 @@ def opendb():
     return conn
 
 def genToken(user, extraArgs=None):
-    assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
     s = hashlib.sha1()
     s.update(str(user['id']))
     s.update(user['email'])

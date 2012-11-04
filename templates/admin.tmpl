@@ -39,10 +39,14 @@
 			<td>
 #if not $printSty
 			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
-#set contractId = $params.getfirst("c")
-#if contractId
-			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$genToken($user, $contractId)&amp;admin=1">Registration</a>
+#if $user.adhesion
+#set $contractId = $user.adhesion.contract_id
+#else
+#set $contractId = $params.getfirst("c")
 #end if
+#set $token = $genToken($user, $contractId)
+			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$token">Registration</a>
+			<a href="/adhesion?u=${user.id}&amp;c=$contractId&amp;t=$token">Adhesion</a>
 #end if
 			</td>
 		</tr>

@@ -50,7 +50,7 @@ CREATE TABLE adhesion (
 )''',
 
 '''CREATE TABLE bake (
-    bakedate date unique not null,
+    bakedate date not null,
     contract_id,
     creation_time datetime not null default current_timestamp
 )''',
@@ -137,6 +137,11 @@ class DBManager(object):
         for field in ('startdate', 'enddate'):
             d['%stime'%field] = datetime.datetime.strptime(d[field], "%Y-%m-%d")
             d[field] = d['%stime'%field].date()
+        return d
+
+    def toDisplayUser(self, row):
+        d = dict(row)
+        d['adhesion'] = self.getCurrentAdhesion(row['id'])
         return d
 
     def toDisplayBake(self, row):
@@ -236,12 +241,14 @@ class DBManager(object):
             clauses.append("WHERE ismailing = ?")
             params.append(ismailing)
         c.execute(" ".join(clauses), params)
-        return c.fetchall()
+        for row in c.fetchall():
+            yield self.toDisplayUser(row)
 
     def getUsersWithOrder(self, bakes):
         c = self.conn.cursor()
         c.execute("SELECT * from user WHERE id IN (SELECT userid FROM bakeorder WHERE bakeid IN (%s))" % (", ".join([str(x['rowid']) for x in bakes]),))
-        return c.fetchall()
+        for row in c.fetchall():
+            yield self.toDisplayUser(row)
 
     def deleteBakeOrders(self, user_id, bake_id):
         assert isinstance(user_id, int)
@@ -306,6 +313,13 @@ class DBManager(object):
         else:
             c.execute("SELECT * FROM adhesionorder WHERE user_id = ?", (userId,))
         return c.fetchall()
+
+    def getCurrentAdhesion(self, userId):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM adhesion WHERE user_id = ? AND contract_id IN (SELECT id FROM contract WHERE enddate >= current_date)", (userId,))
+        if c.rowcount == 0:
+            return None
+        return self.toDisplayAdhesion(c.fetchone())
 
     def getAdhesion(self, userId, contractId):
         c = self.conn.cursor()
