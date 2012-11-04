@@ -349,7 +349,9 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template.products = self.getProducts()
             template.adhesionOrders = self.getAdhesionOrders(userId, contractId)
             if len(template.adhesionOrders) == 0:
-                raise Exception("No orders for contract %s and user %s" % (contractId, userId))
+                template.adhesionOrders = self.getAdhesionOrders(userId)
+                if len(template.adhesionOrders) == 0:
+                    raise Exception("No orders for contract %s and user %s" % (contractId, userId))
             template.adhesion = self.getAdhesion(userId, contractId)
 
             if method == "GET":
