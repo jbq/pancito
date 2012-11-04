@@ -1,16 +1,18 @@
 #! /usr/bin/python
-import os.path
+import os.path, sys
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import pancito.mail
 import sys
 import Cheetah.Template
 
-template = os.path.join(pancito.datadir, "mail/inviteToContract.tmpl")
-contractId = int(sys.argv[1])
+template = sys.argv[1]
+contractId = int(sys.argv[2])
 conn = pancito.opendb()
 db = pancito.db.DBManager(conn)
 contract = db.getContract(contractId)
 for field in ('startdate', 'enddate'):
     contract[field] = contract[field].strftime("%d %B %Y")
+c = conn.cursor()
 c.execute("SELECT * FROM user WHERE ismailing and NOT ismember")
 for user in c.fetchall():
     t = Cheetah.Template.Template(file=template)
