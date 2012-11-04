@@ -187,6 +187,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 verifyToken(template.user, params.getfirst('t'), params.getfirst('c'))
                 if contractId is not None:
                     template.orders = self.getAdhesionOrders(userId, contractId)
+                    if len(template.orders) == 0:
+                        template.orders = self.getAdhesionOrders(userId)
             else:
                 template.user = None
 

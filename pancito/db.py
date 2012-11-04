@@ -299,9 +299,12 @@ class DBManager(object):
         c.execute("UPDATE user SET email_confirm_time = datetime('now') WHERE id = ?", (user_id,))
         self.conn.commit()
 
-    def getAdhesionOrders(self, userId, contractId):
+    def getAdhesionOrders(self, userId, contractId=None):
         c = self.conn.cursor()
-        c.execute("SELECT * FROM adhesionorder WHERE contract_id = ? AND user_id = ?", (contractId, userId))
+        if contractId is not None:
+            c.execute("SELECT * FROM adhesionorder WHERE contract_id = ? AND user_id = ?", (contractId, userId))
+        else:
+            c.execute("SELECT * FROM adhesionorder WHERE user_id = ?", (userId,))
         return c.fetchall()
 
     def getAdhesion(self, userId, contractId):
