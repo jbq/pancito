@@ -11,8 +11,8 @@
 	<thead>
 		<tr>
 			<td></td>
-			#for $bake in $bakes
-			<td class="d">$bake.bakedate
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
+			<td class="d">$bakeDate
 			</td>
 			#end for
 			<td></td>
@@ -24,11 +24,11 @@
 			<td class="pname member-$user.ismember">
 			$user.name
 			</td>
-			#for $bake in $bakes
-			#set $orders = $bake.orders.get($user.id)
-			#if $orders and sum([$x.quantity for x in $orders.values()]) > 0
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
+			#set $orders = $ordersByUser.get($user.id)
+			#if $orders and sum($orders.values()) > 0
 			<td class="y">
-			$orders.get(1).quantity + $orders.get(2).quantity
+			$orders.get(1) + $orders.get(2)
 			</td>
 			#elif $orders
 			<td class="n"></td>
@@ -57,22 +57,22 @@
 	<tfoot>
 		<tr>
 			<td>&nbsp;</td>
-			#for $bake in $bakes
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
-			$sum([$orders.get(1).quantity for $orders in $bake.orders.values()])
+			$sum([$orders.get(1) for $orders in $ordersByUser.values()])
 			+
-			$sum([$orders.get(2).quantity for $orders in $bake.orders.values()])
+			$sum([$orders.get(2) for $orders in $ordersByUser.values()])
 			</td>
 			#end for
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
-			#for $bake in $bakes
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
-			${sum([$orders.get(1).quantity for $orders in $bake.orders.values()]) * 0.875
+			${(sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
 			+
-			sum([$orders.get(2).quantity for $orders in $bake.orders.values()]) * 1.75}
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05}
 			</td>
 			#end for
 			<td>&nbsp;</td>

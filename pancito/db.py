@@ -117,10 +117,54 @@ class DBManager(object):
                 ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
         return ordersByField
 
-    def buildSpecifiedBakesWithOrdersByUser(self, bakes):
+    def _mergeOrders(self, orders1, orders2):
+        d = {}
+
+        for dd in (orders1, orders2):
+            for k, qty in dd.items():
+                try:
+                    d[k] += qty
+                except KeyError:
+                    d[k] = qty
+        return d
+
+    def extractQuantity(self, order):
+        assert isinstance(order, dict), "Expecting dict, got %s: %s" % (type(order), repr(order))
+
+        d = {}
+        for k, v in order.items():
+            d[k] = v['quantity']
+        return d
+
+    def mergeOrders(self, ordersByUserList):
+        d = {}
+        for ordersByUser in ordersByUserList:
+            for userId, orders in ordersByUser.items():
+                try:
+                    d[userId] = self._mergeOrders(self.extractQuantity(orders), d[userId])
+                except KeyError:
+                    d[userId] = self._mergeOrders(self.extractQuantity(orders), {})
+        return d
+
+    def bakeOrdersByDate(self, bakes):
+        """
+        For admin, build an overview of all bake orders for the specified bakes.
+        Bakes with same bake date are grouped in the same entry.  Return value is
+        a dict of the form {bakedate: [bakes]}
+        """
+        bakesByDate = {}
         for bake in bakes:
-            bake["orders"] = self.getBakeOrdersByUserId(bake['rowid'])
-            yield bake
+            ordersByUser = self.getBakeOrdersByUserId(bake['rowid'])
+            try:
+                bakesByDate[bake['bakedate']].append(ordersByUser)
+            except KeyError:
+                bakesByDate[bake['bakedate']] = [ordersByUser]
+
+        for bakeDate, ordersByUserList in bakesByDate.items():
+            bakesByDate[bakeDate] = self.mergeOrders(ordersByUserList)
+
+        for bakeDate in sorted(bakesByDate.keys()):
+            yield (bakeDate, bakesByDate[bakeDate])
 
     def buildBakesWithOrders(self, bakes, userId):
         for bake in bakes:
