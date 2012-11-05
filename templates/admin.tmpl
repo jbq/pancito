@@ -44,9 +44,11 @@
 #else
 #set $contractId = $params.getfirst("c")
 #end if
+#if $contractId
 #set $token = $genToken($user, $contractId)
 			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$token">Registration</a>
 			<a href="/adhesion?u=${user.id}&amp;c=$contractId&amp;t=$token">Adhesion</a>
+#end if
 #end if
 			</td>
 		</tr>
