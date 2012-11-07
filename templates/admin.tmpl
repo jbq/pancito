@@ -1,3 +1,4 @@
+#encoding utf-8
 #import base
 #extends base.base
 
@@ -56,7 +57,7 @@
 	</tbody>
 	<tfoot>
 		<tr>
-			<td>&nbsp;</td>
+			<td>Total commandes</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			$sum([$orders.get(1) for $orders in $ordersByUser.values()])
@@ -67,12 +68,34 @@
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
+			<td>Total pain cuit</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
-			${(sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
+			${round((sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.7
 			+
-			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05}
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.4), 1)}
+			</td>
+			#end for
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Total pâte</td>
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
+			<td>
+			${round((sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
+			+
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05, 1)}
+			</td>
+			#end for
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>Total levain</td>
+			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
+			<td>
+			${round((sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
+			+
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05 / 18.6, 2)}
 			</td>
 			#end for
 			<td>&nbsp;</td>
