@@ -11,10 +11,15 @@ ${params.getfirst(k)}
 #end def
 
 #def content
+#set printSty = $params.getfirst('print')
 #if not($success or $error)
+#if $printSty
+<h1>Formulaire d'inscription</h1>
+#else
 <p class="info">Vous souhaitez vous inscrire pour une distribution de pain
 hebdomadaire? Veuillez renseigner vos coordonnées et votre formule
 hebdomadaire, puis cliquez sur le bouton <i>Enregistrer</i></p>
+#end if
 #else if $success
 <div class="success">Votre demande d'inscription a bien été prise en compte,
 vous allez recevoir un email de confirmation. Si vous ne recevez rien, merci de
@@ -121,7 +126,7 @@ $field('phone')
           </td>
         </tr>
         #end for
-#if not $success
+#if not $success and not $printSty
         <tr>
           <td class="submit" colspan=2>
             <div style="text-align: right">

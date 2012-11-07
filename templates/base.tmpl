@@ -13,14 +13,18 @@ body {
 font: normal normal 12px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
 #else
 font: normal normal 15px Arial, Tahoma, Helvetica, FreeSans, sans-serif;
-#end if
 color: white;
-#if not $printSty
 background: #111111 url(http://3.bp.blogspot.com/-g9tyFyMbiHY/T6KwI7gX0VI/AAAAAAAAE_w/pGWBQwVYrrk/s1600/pancito.JPG) repeat scroll top left;
 margin-left: 25%;
 margin-right: 25%;
 #end if
 }
+
+#if printSty
+h1 {
+    padding-top: 25px;
+}
+#end if
 
 h1, h2 {
 font-weight: normal;
@@ -178,7 +182,11 @@ background-image: url('knobs/Knob%20Cancel.png');
 </head>
 
 <body>
-#if not $printSty
+#if $printSty
+<a href="http://www.pancito.fr/" style="float: right; display: block">
+<img alt="Pancito - boulangerie alternative à Toulouse" width="200px" src="http://dl.dropbox.com/u/5836407/Pancito-headline-black.png">
+</a>
+#else
 <a href="http://www.pancito.fr/" style="display: block">
 <img alt="Pancito - boulangerie alternative à Toulouse" height="79px; " id="Header1_headerimg" src="http://1.bp.blogspot.com/-xHAstUDvDqY/UFM1kif9yQI/AAAAAAAAFD8/46JCU4aGkQI/s1600/Headline.png" style="display: block" width="252px; ">
 </a>
