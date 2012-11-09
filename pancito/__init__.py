@@ -217,7 +217,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 return d
 
             if method == "POST":
-                fields = ('name', 'email', 'address', 'postcode', 'locality', 'phone')
+                fields = ('name', 'email', 'address', 'postcode', 'locality', 'phone', 'comment')
                 d = getRegistration(fields)
 
                 if d is None:
