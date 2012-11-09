@@ -82,9 +82,9 @@
 			<td>Total pâte</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
-			${round((sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
+			${round(sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
 			+
-			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05, 1)}
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75, 1)}
 			</td>
 			#end for
 			<td>&nbsp;</td>
@@ -95,7 +95,7 @@
 			<td>
 			${round((sum([$orders.get(1) for $orders in $ordersByUser.values()]) * 0.875
 			+
-			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) * 1.05 / 18.6, 2)}
+			sum([$orders.get(2) for $orders in $ordersByUser.values()]) * 1.75) / 18.6, 2)}
 			</td>
 			#end for
 			<td>&nbsp;</td>
