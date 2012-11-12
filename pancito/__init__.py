@@ -354,15 +354,14 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                     raise Exception("No orders for contract %s and user %s" % (contractId, userId))
             template.adhesion = self.getAdhesion(userId, contractId)
 
-            if method == "GET":
-                editedBakes = list(self.getBakes(contractId))
-            elif method == "POST":
+            if method == "POST":
                 editedBakes = self.getEditedBakes()
                 self.processBakeOrders(editedBakes, userId)
                 self.conn.commit()
                 template.success = True
 
-            template.bakes = list(self.buildBakesWithOrders(editedBakes, userId))
+            displayedBakes = list(self.getBakes(contractId))
+            template.bakes = list(self.buildBakesWithOrders(displayedBakes, userId))
             for i, bake in enumerate(template.bakes):
                 bake['initialOrders'] = {}
 
