@@ -137,7 +137,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             displayedBakes = list(self.getBakesForIds(displayedBakeIds))
 
             if len(displayedBakes) == 0:
-                displayedBakes = list(self.getBakes())
+                displayedBakes = list(self.getFutureBakes())
 
             if displayAllUsers or displayMailedUsers:
                 template.users = self.getUsers(ismailing=displayMailedUsers)
