@@ -22,8 +22,8 @@
 	<tbody>
 		#for $user in $users
 		<tr>
-			<td class="pname member-$user.ismember">
-			$user.name
+			<td class="pname member-$user.ismember mailing-$user.ismailing">
+			${$user.name or $user.email}
 			</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			#set $orders = $ordersByUser.get($user.id)
