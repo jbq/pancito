@@ -49,6 +49,9 @@
 #set $token = $genToken($user, $contractId)
 			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$token">Registration</a>
 			<a href="/adhesion?u=${user.id}&amp;c=$contractId&amp;t=$token">Adhesion</a>
+#else
+#set $token = $genToken($user)
+			<a href="/register?u=${user.id}&amp;t=$token">Registration</a>
 #end if
 #end if
 			</td>
