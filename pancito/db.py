@@ -194,9 +194,12 @@ class DBManager(object):
         d['bakedate'] = d['bakedatetime'].date()
         return d
 
-    def getFutureBakes(self):
+    def getFutureBakes(self, contractId=None):
         c = self.conn.cursor()
-        c.execute("SELECT rowid, * from bake WHERE bakedate >= CURRENT_DATE")
+        conditions = ["bakedate >= CURRENT_DATE"]
+        if contractId is not None:
+            conditions.append("contract_id = %s" % contractId)
+        c.execute("SELECT rowid, * from bake WHERE %s" % " AND ".join(conditions))
         for row in c.fetchall():
             yield self.toDisplayBake(row)
 

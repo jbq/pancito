@@ -372,12 +372,16 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template = self.getUserTemplate("order")
             template.products = self.getProducts()
             template.adhesionOrders = None
+            try:
+                contractId = int(params.getfirst('c'))
+            except:
+                contractId = None
 
             initialBakes = None
             if method == "GET":
                 editedBakes = list(self.getBakesForIds(params.getlist('b')))
                 if len(editedBakes) == 0:
-                    editedBakes = list(self.getFutureBakes())
+                    editedBakes = list(self.getFutureBakes(contractId))
                 initialBakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             elif method == "POST":
                 editedBakes = self.getEditedBakes()
