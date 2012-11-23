@@ -87,8 +87,15 @@ class DBManager(object):
     def toDisplayAdhesion(self, adhesion):
         return self.toDisplayCreationTime(adhesion)
 
-    def displayOrder(self, order):
+    def toDisplayOrder(self, order):
         return self.toDisplayCreationTime(order)
+
+    def toDisplayOrderWithAmount(self, order):
+        if order is None:
+            return None
+        o = dict(order)
+        o['amount'] = o['quantity'] * o['itemprice']
+        return o
 
     def toDisplayCreationTime(self, order):
         if order is None:
@@ -98,6 +105,20 @@ class DBManager(object):
         ct = ct.replace(tzinfo=pytz.timezone('UTC'))
         order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
         return order
+
+    def getBakeOrdersByUser(self):
+        c = self.conn.cursor()
+        c.execute("SELECT bakeorder.rowid, bakeorder.*, itemprice from bakeorder inner join product ON product.id = productid WHERE bakeid IN (SELECT rowid FROM bake WHERE contract_id IS NOT NULL)")
+        orders = {}
+        for order in c.fetchall():
+            userId = order['userId']
+
+            try:
+                orders[userId].append(self.toDisplayOrderWithAmount(order))
+            except KeyError:
+                orders[userId] = [self.toDisplayOrderWithAmount(order)]
+
+        return orders
 
     def getBakeOrders(self, bakeId, userId):
         assert isinstance(bakeId, (int, long)), "Expecting %s for bakeId, got %s" % (int, type(bakeId))
@@ -112,9 +133,9 @@ class DBManager(object):
         ordersByField = {}
         for order in c.fetchall():
             try:
-                ordersByField[order[field]][order[subfield]] = self.displayOrder(order)
+                ordersByField[order[field]][order[subfield]] = self.toDisplayOrder(order)
             except KeyError:
-                ordersByField[order[field]] = {order[subfield]: self.displayOrder(order)}
+                ordersByField[order[field]] = {order[subfield]: self.toDisplayOrder(order)}
         return ordersByField
 
     def _mergeOrders(self, orders1, orders2):
@@ -185,7 +206,9 @@ class DBManager(object):
 
     def toDisplayUser(self, row):
         d = dict(row)
-        d['adhesion'] = self.getCurrentAdhesion(row['id'])
+        d['currentAdhesion'] = self.getCurrentAdhesion(row['id'])
+        d['adhesions'] = list(self.getUserAdhesionList(row['id']))
+        d['extra_payments'] = list(self.getUserExtraPaymentList(row['id']))
         return d
 
     def toDisplayBake(self, row):
@@ -360,6 +383,18 @@ class DBManager(object):
         else:
             c.execute("SELECT * FROM adhesionorder WHERE user_id = ?", (userId,))
         return c.fetchall()
+
+    def getUserExtraPaymentList(self, userId):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM extra_payment WHERE user_id = ?", (userId,))
+        for row in c.fetchall():
+            yield self.toDisplayAdhesion(row)
+
+    def getUserAdhesionList(self, userId):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM adhesion WHERE user_id = ? AND paperwork_verified is not null", (userId,))
+        for row in c.fetchall():
+            yield self.toDisplayAdhesion(row)
 
     def getCurrentAdhesion(self, userId):
         c = self.conn.cursor()

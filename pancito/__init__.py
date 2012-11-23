@@ -131,6 +131,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         if uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
+            template.allOrdersByUser = self.getBakeOrdersByUser()
             displayedBakeIds = params.getlist('b')
             displayMailedUsers = (params.getfirst('du') == "mailed")
             displayAllUsers = (params.getfirst('du') == "all")

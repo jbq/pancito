@@ -16,6 +16,7 @@
 			<td class="d">$bakeDate
 			</td>
 			#end for
+			<td>Solde</td>
 			<td></td>
 		</tr>
 	</thead>
@@ -37,11 +38,15 @@
 			<td class="na"></td>
 			#end if
 			#end for
+<td>
+#set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id)])) / 100
+<span class="balance-${int($balance >= 0)}">$balance</span>
+</td>
 			<td>
 #if not $printSty
 			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
-#if $user.adhesion
-#set $contractId = $user.adhesion.contract_id
+#if $user.currentAdhesion
+#set $contractId = $user.currentAdhesion.contract_id
 #else
 #set $contractId = $params.getfirst("c")
 #end if
