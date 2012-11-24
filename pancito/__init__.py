@@ -287,9 +287,10 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         if uri == "/emailConfirmation":
             template = self.getUserTemplate("emailConfirmation")
             # FIXME choose contract with newadhesion = True
-            template.contract = self.getContract(1)
+            openContract = 3
+            template.contract = self.getContract(openContract)
             self.confirmEmail(template.user['id'])
-            template.futureBakes = list(self.getFutureBakes())
+            template.futureBakes = list(self.getFutureBakes(openContract))
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
 

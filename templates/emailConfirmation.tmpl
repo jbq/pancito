@@ -11,12 +11,12 @@ inscription est maintenant confirmée.</i></p>
 <div class="main">
     <h2>Merci pour votre soutien à Pancito!</h2>
     <div class="content">
-<div class="text">
 #if len($futureBakes) > 0
-	<p>Pour goûter le pain et tester le fonctionnement d'une distribution
-avant de signer un contrat d'adhésion, voici les prochaines dates où vous pourrez
-nous rencontrer, veuillez sélectionner la date qui vous convient et passez
-votre commande:</p>
+<div class="text">
+	<p>Si vous souhaitez goûter le pain et tester le fonctionnement d'une
+distribution avant de signer un contrat d'adhésion, voici les prochaines dates
+où vous pourrez nous rencontrer.   Veuillez sélectionner celle qui vous
+convient pour passer commande:</p>
 
 <ul>
 #for $bake in $futureBakes[:4]
@@ -24,12 +24,14 @@ votre commande:</p>
 #end for
 </ul>
 
-<p><b>La distribution a lieu aux dates indiquées, ${contract.timeslot} ${contract.place}.  L'adhésion vous sera proposée en fonction des places disponibles.</b></p>
-
-#else
-<p>Nous vous tiendrons au courant par email dès qu'une place est disponible.</p>
+<p><b>La distribution a lieu aux dates indiquées, ${contract.timeslot} ${contract.place}.</b></p>
 #end if
-</div>
     </div>
+</div>
+</div>
+
+<div class="main">
+<h2 class="success">Nous avons bien noté vôtre intérêt pour Pancito.  L'adhésion vous sera proposée en fonction des
+places disponibles.  Nous vous tiendrons informé par email.</h2>
 </div>
 #end def
