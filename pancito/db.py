@@ -235,6 +235,7 @@ class DBManager(object):
         if contractId is not None:
             statements.append("WHERE contract_id = ?")
             args.append(contractId)
+        statements.append("ORDER BY bakedate")
         c.execute(" ".join(statements), args)
         for row in c.fetchall():
             yield self.toDisplayBake(row)
