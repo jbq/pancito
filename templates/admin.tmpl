@@ -39,7 +39,7 @@
 			#end if
 			#end for
 <td>
-#set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id)])) / 100
+#set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100
 <span class="balance-${int($balance >= 0)}">$balance</span>
 </td>
 			<td>
