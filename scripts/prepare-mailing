@@ -6,12 +6,20 @@ import getopt, Cheetah.Template
 
 userFlag = "ismailing"
 contract = None
-options, args = getopt.getopt(sys.argv[1:], "mnc:", ("members", "non-members", "contract="))
+options, args = getopt.getopt(sys.argv[1:], "mnc:", ("members", "non-members", "user-contract=", "contract="))
 for option, value in options:
     if option in ("-m", "--members"):
         userFlag = "ismember"
     elif option in ("-n", "--non-members"):
         userFlag = "ismailing AND not ismember"
+    elif option in ("--user-contract",):
+        contractId = int(value)
+        # FIXME user should hold some more information to avoid so complicated
+        # query, or bakeorder should repeat contract id
+        userFlag = "id IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % contractId
+        conn = pancito.opendb()
+        db = pancito.db.DBManager(conn)
+        contract = db.getContract(contractId)
     elif option in ("-c", "--contract"):
         userFlag = "ismember"
         contractId = int(value)
@@ -19,11 +27,10 @@ for option, value in options:
         db = pancito.db.DBManager(conn)
         contract = db.getContract(contractId)
 
-template = os.path.join(pancito.datadir, "mail.tmpl")
+template = args[0]
 conn = pancito.opendb()
 c = conn.cursor()
 c.execute("SELECT * FROM user WHERE %s" % userFlag)
-template = os.path.join(pancito.datadir, "mail/mail.tmpl")
 t = Cheetah.Template.Template(file=template)
 for user in c.fetchall():
     pancito.mail.writeMail(user, pancito.mail.mail_template(user, t, contract))
