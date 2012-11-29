@@ -5,8 +5,6 @@
 #def content
 #set printSty = $params.getfirst('print')
 <div class="main">
-<h2>Admin</h2>
-
 <div class="content">
 <table class="poll">
 	<thead>
@@ -16,7 +14,9 @@
 			<td class="d">$bakeDate
 			</td>
 			#end for
+#if not $printSty
 			<td>Solde</td>
+#end if
 			<td></td>
 		</tr>
 	</thead>
@@ -38,10 +38,12 @@
 			<td class="na"></td>
 			#end if
 			#end for
+#if not $printSty
 <td>
 #set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100
 <span class="balance-${int($balance >= 0)}">$balance</span>
 </td>
+#end if
 			<td>
 #if not $printSty
 			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
@@ -86,6 +88,7 @@
 			#end for
 			<td>&nbsp;</td>
 		</tr>
+#if not $printSty
 		<tr>
 			<td>Total pâte</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
@@ -108,6 +111,7 @@
 			#end for
 			<td>&nbsp;</td>
 		</tr>
+#end if
 	</tfoot>
 </table>
 </div>

@@ -107,8 +107,10 @@ background-color: #F8F8F8;
 }
 
 table.poll tr td.d {
+#if not $printSty
 background-color: #3385E4;
 color: white;
+#end if
 }
 
 .main h2 {
@@ -200,7 +202,7 @@ background-image: url('knobs/Knob%20Cancel.png');
 
 <body>
 #if $printSty
-<a href="http://www.pancito.fr/" style="float: right; display: block">
+<a href="http://www.pancito.fr/">
 <img alt="Pancito - boulangerie alternative à Toulouse" width="200px" src="http://dl.dropbox.com/u/5836407/Pancito-headline-black.png">
 </a>
 #else
