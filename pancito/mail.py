@@ -41,7 +41,7 @@ def mail_template(user, t, contract=None):
 def writeMail(user, mailData):
     assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
 
-    with open(os.path.join(maildir(), "%02u" % user['id']), "w") as f:
+    with open(os.path.join(maildir(), "%03u" % user['id']), "w") as f:
         f.write(mailData)
 
 def mail_template_with_pdf_attachment(user, t, contract, pdfData):
