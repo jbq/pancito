@@ -248,6 +248,14 @@ class DBManager(object):
             if row is not None:
                 yield self.toDisplayBake(row)
 
+    def getContractsForIds(self, contractIds):
+        c = self.conn.cursor()
+        for contractId in contractIds:
+            c.execute("SELECT rowid, * from contract WHERE id = ?", (contractId,))
+            row = c.fetchone()
+            if row is not None:
+                yield self.toDisplayContract(row)
+
     def getProducts(self):
         c = self.conn.cursor()
         c.execute("SELECT * from product")

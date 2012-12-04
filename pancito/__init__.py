@@ -132,13 +132,20 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             self.conn = opendb()
             template=self.getTemplate("admin")
             template.allOrdersByUser = self.getBakeOrdersByUser()
+            displayedContractIds = params.getlist('dc')
             displayedBakeIds = params.getlist('b')
             displayMailedUsers = (params.getfirst('du') == "mailed")
             displayAllUsers = (params.getfirst('du') == "all")
             displayedBakes = list(self.getBakesForIds(displayedBakeIds))
 
             if len(displayedBakes) == 0:
-                displayedBakes = list(self.getFutureBakes())
+                displayedContracts = list(self.getContractsForIds(displayedContractIds))
+                if len(displayedContracts) > 0:
+                    displayedBakes = []
+                    for x in displayedContracts:
+                        displayedBakes += list(self.getBakes(x['id']))
+                else:
+                    displayedBakes = list(self.getFutureBakes())
 
             if displayAllUsers or displayMailedUsers:
                 template.users = self.getUsers(ismailing=displayMailedUsers)
