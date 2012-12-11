@@ -153,6 +153,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 template.users = self.getUsersWithOrder(displayedBakes)
 
             template.bakeOrdersByDate = list(self.bakeOrdersByDate(displayedBakes))
+            template.bakes = displayedBakes
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
 

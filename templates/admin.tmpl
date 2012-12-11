@@ -11,7 +11,13 @@
 		<tr>
 			<td></td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
-			<td class="d">$bakeDate
+			<td class="d">
+#if $printSty
+			$bakeDate
+#else
+#set $bakeIds = "&amp;".join(["b=%s" % b['rowid'] for b in $bakes if b['bakedate']==$bakeDate])
+			<a href="?$bakeIds">$bakeDate</a>
+#end if
 			</td>
 			#end for
 #if not $printSty
