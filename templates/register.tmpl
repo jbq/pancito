@@ -21,11 +21,15 @@ renseigner ce formulaire d'inscription, puis cliquez sur le bouton
 <i>Enregistrer</i></p>
 #end if
 #else if $success
+#if $emailSent
 <div class="success">Votre demande d'inscription a bien été prise en compte,
 vous allez recevoir un email de confirmation. Si vous ne recevez rien, merci de
 vérifier que le message n'est pas dans le dossier Spam. Si vous ne retrouvez pas
 notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
 <a href="/register">recommencez l'inscription</a>.</div>
+#else
+<div class="success">Vos coordonnées ont été mises à jour.</div>
+#end if
 #end if
 
 <form method="POST" accept-charset="UTF-8">

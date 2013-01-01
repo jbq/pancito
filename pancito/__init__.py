@@ -231,7 +231,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                 if d is None:
                     template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
-                elif d['email'].find('@') == -1:
+                elif '@' not in d['email']:
                     template.error = "Veuillez saisir une adresse email valide"
                 elif not checkProducts():
                     template.error = "Veuillez préciser votre commande hebdomadaire avec au moins un produit!"
@@ -274,11 +274,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                             mail.sendMail(mail.mail_template(user, t))
 
                         self.conn.commit()
-                        if email:
-                            template.emailSent = True
-                            template.success = True
-                        else:
-                            template.emailSent = False
+                        template.emailSent = email
+                        template.success = True
 
                         if email is False and userId is not None and contractId is not None:
                             # No need to confirm email, go to adhesion form directly
