@@ -33,7 +33,11 @@
 			<td class="pname member-$user.ismember mailing-$user.ismailing">
 			${$user.name or $user.email}
 			</td>
-<td>$user.place_id</td>
+<td>
+#if $user.place
+<a href="?p=${user.place_id}">$user.place.nickname</a>
+#end if
+</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			#set $orders = $ordersByUser.get($user.id)
 			#if $orders and sum($orders.values()) > 0
