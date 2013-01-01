@@ -4,33 +4,37 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 import pancito.mail, pancito.db
 import getopt, Cheetah.Template
 
-userFlag = "ismailing"
+conditions = []
 contract = None
-options, args = getopt.getopt(sys.argv[1:], "mnc:", ("members", "non-members", "user-contract=", "contract="))
+options, args = getopt.getopt(sys.argv[1:], "mnc:p:", ("members", "non-members", "user-contract=", "contract=", "place="))
 for option, value in options:
     if option in ("-m", "--members"):
-        userFlag = "ismember"
+        conditions.append("ismember")
     elif option in ("-n", "--non-members"):
-        userFlag = "ismailing AND not ismember"
+        conditions.append("ismailing")
+        conditions.append("not ismember")
     elif option in ("--user-contract",):
-        contractId = int(value)
+        userContractId = int(value)
         # FIXME user should hold some more information to avoid so complicated
         # query, or bakeorder should repeat contract id
-        userFlag = "id IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % contractId
-        conn = pancito.opendb()
-        db = pancito.db.DBManager(conn)
-        contract = db.getContract(contractId)
+        conditions.append("ismember")
+        conditions.append("id IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % userContractId)
     elif option in ("-c", "--contract"):
-        userFlag = "ismember"
         contractId = int(value)
         conn = pancito.opendb()
         db = pancito.db.DBManager(conn)
         contract = db.getContract(contractId)
+    elif option in ("-p", "--place"):
+        # Provide a default value, as --user-contract is more precise
+        conditions.append("place_id = %s" % int(value))
+
+if contract is None:
+    conditions.append("ismailing")
 
 template = args[0]
 conn = pancito.opendb()
 c = conn.cursor()
-c.execute("SELECT * FROM user WHERE %s" % userFlag)
+c.execute("SELECT * FROM user WHERE %s" % " AND ".join(conditions))
 t = Cheetah.Template.Template(file=template)
 for user in c.fetchall():
     pancito.mail.writeMail(user, pancito.mail.mail_template(user, t, contract))
