@@ -10,6 +10,7 @@
 	<thead>
 		<tr>
 			<td></td>
+			<td></td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td class="d">
 #if $printSty
@@ -32,6 +33,7 @@
 			<td class="pname member-$user.ismember mailing-$user.ismailing">
 			${$user.name or $user.email}
 			</td>
+<td>$user.place_id</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			#set $orders = $ordersByUser.get($user.id)
 			#if $orders and sum($orders.values()) > 0
@@ -73,7 +75,7 @@
 	</tbody>
 	<tfoot>
 		<tr>
-			<td>Total commandes</td>
+			<td colspan=2>Total commandes</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			$sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()])
@@ -84,7 +86,7 @@
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>Total pain cuit</td>
+			<td colspan=2>Total pain cuit</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round((sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.7
@@ -96,7 +98,7 @@
 		</tr>
 #if not $printSty
 		<tr>
-			<td>Total pâte</td>
+			<td colspan=2>Total pâte</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round(sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.875
@@ -107,7 +109,7 @@
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td>Total levain</td>
+			<td colspan=2>Total levain</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round((sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.875
