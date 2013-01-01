@@ -6,7 +6,7 @@ import getopt, Cheetah.Template
 
 conditions = []
 contract = None
-options, args = getopt.getopt(sys.argv[1:], "mnc:p:", ("members", "non-members", "user-contract=", "contract=", "place="))
+options, args = getopt.getopt(sys.argv[1:], "mnc:p:", ("members", "non-members", "user-contract=", "no-user-contract=", "contract=", "place="))
 for option, value in options:
     if option in ("-m", "--members"):
         conditions.append("ismember")
@@ -19,6 +19,12 @@ for option, value in options:
         # query, or bakeorder should repeat contract id
         conditions.append("ismember")
         conditions.append("id IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % userContractId)
+    elif option in ("--no-user-contract",):
+        noUserContractId = int(value)
+        # FIXME user should hold some more information to avoid so complicated
+        # query, or bakeorder should repeat contract id
+        conditions.append("ismember")
+        conditions.append("id NOT IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % noUserContractId)
     elif option in ("-c", "--contract"):
         contractId = int(value)
         conn = pancito.opendb()
