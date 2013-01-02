@@ -137,8 +137,14 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             displayedPlaces = params.getlist('p')
             if len(displayedPlaces) == 0:
                 displayedPlaces = None
-            displayMailedUsers = (params.getfirst('du') == "mailed")
-            displayAllUsers = (params.getfirst('du') == "all")
+            userCriteria = {}
+            for option in params.getlist("du"):
+                for criterium in ('mailing', 'member', 'order'):
+                    if option == criterium:
+                        userCriteria["is%s"%criterium] = True
+                    elif option == "no%s" % criterium:
+                        userCriteria["is%s"%criterium] = False
+
             displayedBakes = list(self.getBakesForIds(displayedBakeIds))
 
             if len(displayedBakes) == 0:
@@ -150,10 +156,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 else:
                     displayedBakes = list(self.getFutureBakes(places=displayedPlaces))
 
-            if displayAllUsers or displayMailedUsers:
-                template.users = self.getUsers(ismailing=displayMailedUsers)
-            else:
-                template.users = self.getUsersWithOrder(displayedBakes)
+            userCriteria['bakes'] = displayedBakes
+            template.users = self.getUsers(**userCriteria)
 
             template.bakeOrdersByDate = list(self.bakeOrdersByDate(displayedBakes))
             template.bakes = displayedBakes

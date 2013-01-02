@@ -322,20 +322,25 @@ class DBManager(object):
         c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE id = ?", (mailing, user['id'],))
         self.conn.commit()
 
-    def getUsers(self, ismailing=False):
+    def getUsers(self, ismailing=None, ismember=None, isorder=None, bakes=None):
         c = self.conn.cursor()
         params = []
-        clauses = ["SELECT * from user"]
-        if ismailing:
-            clauses.append("WHERE ismailing = ?")
+        conditions = ["1"]
+        if ismailing is not None:
+            conditions.append("ismailing = ?")
             params.append(ismailing)
-        c.execute(" ".join(clauses), params)
-        for row in c.fetchall():
-            yield self.toDisplayUser(row)
-
-    def getUsersWithOrder(self, bakes):
-        c = self.conn.cursor()
-        c.execute("SELECT * from user WHERE id IN (SELECT userid FROM bakeorder WHERE bakeid IN (%s))" % (", ".join([str(x['rowid']) for x in bakes]),))
+        if ismember is not None:
+            conditions.append("ismember = ?")
+            params.append(ismember)
+        if isorder is not None:
+            # Whether user has orders or not for the specified bakes
+            if isorder is True:
+                not_keyword = ''
+            else:
+                not_keyword = ' NOT'
+            conditions.append("id%s IN (SELECT userid FROM bakeorder WHERE bakeid IN (%s))" % (not_keyword, ", ".join([str(x['rowid']) for x in bakes]),))
+        q = "SELECT * from user WHERE %s" % " AND ".join(conditions)
+        c.execute(q, params)
         for row in c.fetchall():
             yield self.toDisplayUser(row)
 
