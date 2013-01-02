@@ -221,6 +221,7 @@ class DBManager(object):
         d = dict(row)
         d['bakedatetime'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
         d['bakedate'] = d['bakedatetime'].date()
+        d['contract'] = self.getContract(d['contract_id'])
         return d
 
     def getFutureBakes(self, contractId=None, places=None):
