@@ -29,6 +29,9 @@
 	</thead>
 	<tbody>
 		#for $user in $users
+#set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100
+#set $hideZeroBalance = False
+#if not($hideZeroBalance) or $hideZeroBalance and $balance != 0
 		<tr>
 			<td class="pname member-$user.ismember mailing-$user.ismailing">
 			${$user.name or $user.email}
@@ -50,10 +53,13 @@
 			<td class="na"></td>
 			#end if
 			#end for
-#if not $printSty
+#if $hideZeroBalance or not $printSty
 <td>
-#set balance = ($user.balance + sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100
 <span class="balance-${int($balance >= 0)}">$balance</span>
+#set debug = False
+#if debug
+= ($user.balance + ${sum([x['amount'] for x in $user.adhesions])} + ${sum([x['amount'] for x in $user.extra_payments])} - ${sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])}) / 100
+#end if
 </td>
 #end if
 			<td>
@@ -75,6 +81,7 @@
 #end if
 			</td>
 		</tr>
+#end if
 		#end for
 	</tbody>
 	<tfoot>

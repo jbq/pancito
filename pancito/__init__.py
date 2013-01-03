@@ -131,8 +131,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         if uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
-            template.allOrdersByUser = self.getBakeOrdersByUser()
             displayedContractIds = params.getlist('dc')
+            template.allOrdersByUser = self.getBakeOrdersByUser(displayedContractIds)
             displayedBakeIds = params.getlist('b')
             displayedPlaces = params.getlist('p')
             if len(displayedPlaces) == 0:

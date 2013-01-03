@@ -106,9 +106,13 @@ class DBManager(object):
         order['creation_time'] = ct.astimezone(pytz.timezone('Europe/Paris'))
         return order
 
-    def getBakeOrdersByUser(self):
+    def getBakeOrdersByUser(self, contractIds=None):
         c = self.conn.cursor()
-        c.execute("SELECT bakeorder.rowid, bakeorder.*, itemprice from bakeorder inner join product ON product.id = productid WHERE bakeid IN (SELECT rowid FROM bake WHERE contract_id IS NOT NULL)")
+        if contractIds is not None and len(contractIds) > 0:
+            contractCondition  = "contract_id IN (%s)" % ', '.join(contractIds)
+        else:
+            contractCondition = "id is not null"
+        c.execute("SELECT bakeorder.rowid, bakeorder.*, itemprice from bakeorder inner join product ON product.id = productid WHERE bakeid IN (SELECT rowid FROM bake WHERE %s)" % contractCondition)
         orders = {}
         for order in c.fetchall():
             userId = order['userId']
