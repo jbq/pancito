@@ -111,7 +111,7 @@ class DBManager(object):
         if contractIds is not None and len(contractIds) > 0:
             contractCondition  = "contract_id IN (%s)" % ', '.join(contractIds)
         else:
-            contractCondition = "id is not null"
+            contractCondition = "contract_id is not null"
         c.execute("SELECT bakeorder.rowid, bakeorder.*, itemprice from bakeorder inner join product ON product.id = productid WHERE bakeid IN (SELECT rowid FROM bake WHERE %s)" % contractCondition)
         orders = {}
         for order in c.fetchall():
