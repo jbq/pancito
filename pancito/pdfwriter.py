@@ -35,7 +35,7 @@ class ContractGenerator:
             orderdisplays.append("%s %s" % (order['quantity'], order['name']))
             orderAmount += order['quantity'] * order['itemprice']
         info.order = " et ".join(orderdisplays)
-        info.balance = pancito.displayAmount(orderAmount - user['balance'])
+        info.balance = pancito.displayAmount(orderAmount)
 
         rw_database = RWDatabase(fs=lfs)
         handler = rw_database.get_handler(os.path.join(pancito.datadir, 'model.odt'))
