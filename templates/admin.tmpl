@@ -9,8 +9,7 @@
 <table class="poll">
 	<thead>
 		<tr>
-			<td></td>
-			<td></td>
+			<td colspan=2><div class="note"><a href="?db=1">Debug balance</a><br><a href="?zb=0">Hide zero balance</a></div></td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td class="d">
 #if $printSty
@@ -30,7 +29,7 @@
 	<tbody>
 		#for $user in $users
 #set balance = (sum([x['amount'] for x in $user.adhesions]) + sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100
-#set $hideZeroBalance = False
+#set $hideZeroBalance = ($params.getfirst('zb') == "0")
 #if not($hideZeroBalance) or $hideZeroBalance and $balance != 0
 		<tr>
 			<td class="pname member-$user.ismember mailing-$user.ismailing">
@@ -56,7 +55,7 @@
 #if $hideZeroBalance or not $printSty
 <td>
 <span class="balance-${int($balance >= 0)}">$balance</span>
-#set debug = False
+#set debug = ($params.getfirst('db') == '1')
 #if debug
 = (${sum([x['amount'] for x in $user.adhesions])} + ${sum([x['amount'] for x in $user.extra_payments])} - ${sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])}) / 100
 #end if
