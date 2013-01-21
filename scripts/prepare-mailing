@@ -34,7 +34,7 @@ for option, value in options:
         # Provide a default value, as --user-contract is more precise
         conditions.append("place_id = %s" % int(value))
 
-if contract is None:
+if len(conditions) == 0:
     conditions.append("ismailing")
 
 template = args[0]
