@@ -9,7 +9,11 @@
 <table class="poll">
 	<thead>
 		<tr>
-			<td colspan=2><div class="note"><a href="?db=1">Debug balance</a><br><a href="?zb=0">Hide zero balance</a></div></td>
+			<td colspan=2>
+#if not $printSty
+<div class="note"><a href="?db=1">Debug balance</a><br><a href="?zb=0">Hide zero balance</a></div>
+#end if
+</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td class="d">
 #if $printSty
@@ -37,7 +41,11 @@
 			</td>
 <td>
 #if $user.place
+#if not $printSty
 <a href="?p=${user.place_id}">$user.place.nickname</a>
+#else
+$user.place.nickname
+#end if
 #end if
 </td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
