@@ -67,7 +67,7 @@
 #if $user.currentAdhesion
 #set $contractId = $user.currentAdhesion.contract_id
 #else
-#set $contractId = $params.getfirst("c")
+#set $contractId = $contractsByPlace[$user.place_id].id
 #end if
 #if $contractId
 #set $token = $genToken($user, $contractId)

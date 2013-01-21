@@ -208,6 +208,17 @@ class DBManager(object):
             d[field] = d['%stime'%field].date()
         return d
 
+    def getContractsByPlace(self):
+        contracts = {}
+        c = self.conn.cursor()
+        c.execute("SELECT rowid, * FROM contract order by startdate")
+        for row in c.fetchall():
+            # Overwrites contract with same place_id to keep the one with latest
+            # startdate
+            contracts[row['place_id']] = row
+
+        return contracts
+
     def getPlace(self, placeId):
         c = self.conn.cursor()
         c.execute("SELECT rowid, * FROM places WHERE id = ?", (placeId,))
