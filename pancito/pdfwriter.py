@@ -16,12 +16,19 @@ class Struct:
 class ContractGenerator:
     def gencontract(self, user, contract):
         c = self.conn.cursor()
-        for field in ('startdate', 'enddate'):
-            contract[field] = contract[field].strftime("%d %B %Y")
+
+        c.execute("SELECT coalesce(sum(amount), 0) FROM extra_payment WHERE contract_id = ? AND user_id = ?", (contract['id'], user['id']))
+        extraAmount = c.fetchone()[0]
+
         c.execute("SELECT sum(quantity) AS quantity, * FROM bakeorder INNER JOIN bake ON bake.rowid = bakeid INNER JOIN product ON product.id = productid WHERE contract_id = ? AND userid = ? GROUP BY productid", (contract['id'], user['id']))
         orders = c.fetchall()
         if len(orders) == 0:
             raise Exception("No order for %s, skipping" % user['name'])
+
+        # Adapt contract for display
+        for field in ('startdate', 'enddate'):
+            contract[field] = contract[field].strftime("%d %B %Y")
+
         info = Struct(**user)
         info.update(**contract)
         info.date = date.today().strftime("%d %B %Y")
@@ -35,7 +42,7 @@ class ContractGenerator:
             orderdisplays.append("%s %s" % (order['quantity'], order['name']))
             orderAmount += order['quantity'] * order['itemprice']
         info.order = " et ".join(orderdisplays)
-        info.balance = pancito.displayAmount(orderAmount)
+        info.balance = pancito.displayAmount(orderAmount - extraAmount)
 
         rw_database = RWDatabase(fs=lfs)
         handler = rw_database.get_handler(os.path.join(pancito.datadir, 'model.odt'))
