@@ -359,6 +359,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 self.confirmEmail(userId)
 
             template.user = self.getUser(userId)
+            template.contract = self.getContract(contractId)
             # contract id is included in token
             verifyToken(template.user, params.getfirst('t'), params.getfirst('c'))
             template.products = self.getProducts()

@@ -44,12 +44,32 @@ Merci!</b>
 #end if
 
 <div class="main">
+<h2>Distribution</h2>
+<div class="content">
+<table class='order'>
+<tr>
+<td width="30%"><b>Lieu</b></td>
+<td>$contract.place</td>
+</tr>
+<tr>
+<td><b>Horaire</b></td>
+<td>$contract.timeslot</td>
+</tr>
+<tr>
+<td><b>Période</b></td>
+<td>du $contract.startdate.strftime("%A %d %B %Y") au $contract.enddate.strftime("%A %d %B %Y")</td>
+</tr>
+</table>
+</div>
+</div>
+
+<div class="main">
 <h2>Prix du pain</h2>
 <div class="content">
 <table class='order'>
 #for $j, $product in enumerate($products)
 <tr>
-<td>$product.name</td>
+<td width="30%"><b>$product.name</b></td>
 <td>$displayAmount($product.itemprice) € l'unité</td>
 </tr>
 #end for

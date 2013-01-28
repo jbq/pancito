@@ -302,7 +302,7 @@ class DBManager(object):
         assert isinstance(userId, int)
         c = self.conn.cursor()
         c.execute("SELECT * from user WHERE id = ?", (userId,))
-        return c.fetchone()
+        return self.toDisplayUser(c.fetchone())
 
     def register(self, fields, d):
         assert isinstance(fields, (list, tuple))
