@@ -76,6 +76,8 @@ $user.place.nickname
 #set $contractId = $user.currentAdhesion.contract_id
 #elif $user.place_id
 #set $contractId = $contractsByPlace[$user.place_id].id
+#else
+#set $contractId = None
 #end if
 #if $contractId
 #set $token = $genToken($user, $contractId)
