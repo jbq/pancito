@@ -74,7 +74,7 @@ $user.place.nickname
 			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
 #if $user.currentAdhesion
 #set $contractId = $user.currentAdhesion.contract_id
-#else
+#elif $user.place_id
 #set $contractId = $contractsByPlace[$user.place_id].id
 #end if
 #if $contractId
