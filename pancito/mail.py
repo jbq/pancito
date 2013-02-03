@@ -27,7 +27,7 @@ def encodeHeader(v):
 
 def mail_template(user, t, contract=None):
     assert isinstance(t, Cheetah.Template.Template)
-    assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
+    assert isinstance(user, dict), "Expecting %s for user param, got %s" % (dict, type(user))
     t.orderUrl = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
     t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
     if contract is not None:
