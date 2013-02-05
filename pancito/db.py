@@ -1,6 +1,7 @@
 import datetime
 import sqlite3
 import pytz
+import pancito
 
 createTables = [
 '''CREATE TABLE user (
@@ -85,7 +86,32 @@ class DBManager(object):
         return self.getBakeOrdersByField(bakeId, "userid", "productid")
 
     def toDisplayAdhesion(self, adhesion):
-        return self.toDisplayCreationTime(adhesion)
+        if adhesion is None:
+            return None
+        d = self.toDisplayCreationTime(adhesion)
+        d['extraAmount'] = self.computeExtraAmount(adhesion)
+        d['orderAmount'] = self.computeOrderAmount(adhesion)
+        paidAmount = adhesion['amount'] + d['extraAmount']
+        d['balance'] = paidAmount - d['orderAmount']
+        d['displayBalance'] = pancito.displayAmount(d['balance'])
+        d['displayAmount'] = pancito.displayAmount(paidAmount)
+        d['displayOrderAmount'] = pancito.displayAmount(d['orderAmount'])
+        return d
+
+    def computeExtraAmount(self, adhesion):
+        c = self.conn.cursor()
+        c.execute("SELECT coalesce(sum(amount), 0) FROM extra_payment WHERE contract_id = ? AND user_id = ?", (adhesion['contract_id'], adhesion['user_id']))
+        return c.fetchone()[0]
+
+    def computeOrderAmount(self, adhesion):
+        c = self.conn.cursor()
+        c.execute("SELECT sum(quantity) AS quantity, * FROM bakeorder INNER JOIN bake ON bake.rowid = bakeid INNER JOIN product ON product.id = productid WHERE contract_id = ? AND userid = ? GROUP BY productid", (adhesion['contract_id'], adhesion['user_id']))
+        orders = c.fetchall()
+
+        orderAmount = 0
+        for order in orders:
+            orderAmount += order['quantity'] * order['itemprice']
+        return orderAmount
 
     def toDisplayOrder(self, order):
         return self.toDisplayCreationTime(order)

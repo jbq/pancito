@@ -43,7 +43,41 @@ Merci!</b>
 </div>
 #end if
 
-<div class="main">
+#if $adhesion
+<div class="main aux">
+<h2>Adhésion</h2>
+<div class="content">
+<table class='order'>
+<tr>
+<td width="30%"><b>Montant de l'adhésion</b></td>
+<td>$adhesion.displayAmount €
+#if $adhesion.paperwork_verified is None
+<span class="negative">En attente de règlement</span>
+#end if
+</td>
+</tr>
+<tr>
+<td width="30%"><b>Montant de la commande</b></td>
+<td>$adhesion.displayOrderAmount €</td>
+</tr>
+#if $adhesion.paperwork_verified
+<tr>
+<td width="30%"><b>Solde</b></td>
+<td>
+#if $adhesion.balance >= 0
+$adhesion.displayBalance €
+#else
+<span class="negative">$adhesion.displayBalance €</span>
+#end if
+</td>
+</tr>
+#end if
+</table>
+</div>
+</div>
+#end if
+
+<div class="main aux">
 <h2>Distribution</h2>
 <div class="content">
 <table class='order'>
@@ -63,7 +97,7 @@ Merci!</b>
 </div>
 </div>
 
-<div class="main">
+<div class="main aux">
 <h2>Prix du pain</h2>
 <div class="content">
 <table class='order'>

@@ -51,7 +51,7 @@ def verifyToken(user, token, extraArgs=None):
 
 def displayAmount(v):
     assert isinstance(v, int)
-    vv = str(v)
+    vv = str(v).ljust(3, "0")
     return "%s,%s" % (vv[:-2], vv[-2:])
 
 class BadRequest(Exception):
