@@ -61,7 +61,7 @@ def mail_template_with_pdf_attachment(user, t, contract, pdfData):
     return msg.as_string()
 
 def buildContractEmail(user, contract, pdfData):
-    assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
+    assert isinstance(user, dict), "Expecting %s for user param, got %s" % (dict, type(user))
     assert isinstance(contract, dict), "Expecting %s for contract param, got %s" % (dict, type(contract))
 
     template = os.path.join(pancito.datadir, "mail/contract.tmpl")
