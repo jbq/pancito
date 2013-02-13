@@ -1,0 +1,21 @@
+<div class="main">
+    <h2>Si vous ne souhaitez pas adhérer tout de suite</h2>
+    <div class="content">
+#if len($futureBakes) > 0
+<div class="text">
+	<p>Si vous souhaitez goûter le pain et tester le fonctionnement d'une
+distribution avant de signer un contrat d'adhésion, voici les prochaines dates
+où vous pourrez nous rencontrer.   Veuillez sélectionner celle qui vous
+convient pour passer commande:</p>
+
+<ul>
+#for $bake in $futureBakes[:4]
+<li><a href="order?b=${bake.rowid}&amp;userId=${params.getfirst('userId')}&amp;t=${params.getfirst('t')}">$bake.bakedate.strftime("%A %d %B %Y")</a></li>
+#end for
+</ul>
+
+<p><b>La distribution a lieu aux dates indiquées, ${contract.timeslot} ${contract.place}.</b></p>
+#end if
+    </div>
+</div>
+</div>
