@@ -110,12 +110,14 @@ $adhesion.displayBalance €
 </table>
 </div>
 </div>
-
+#def submit
+      <input class="submit" type="image" value="Enregistrer" width="140px" src="http://dl.dropbox.com/u/5836407/Pancito/Enregistrer.png">
+#end def
 <form method="POST">
   <div class="main">
 #if not $success and not $printSty
     <div style="float: right; padding: 1em">
-      <input class="submit" type="submit" value="Enregistrer">
+	$submit
     </div>
 #end if
 <h2>Calendrier de distribution
@@ -178,7 +180,7 @@ $bake.bakedate.strftime("%A %d %B %Y")
         <tr>
           <td class="submit" colspan=2>
             <div style="text-align: right">
-              <input class="submit" type="submit" value="Enregistrer">
+		$submit
             </div>
           </td>
         </tr>
