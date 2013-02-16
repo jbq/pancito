@@ -104,6 +104,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         template.now = datetime.datetime.now()
         params = self.getQueryParameters()
         template.params = params
+        template.environ = self.environ
+        template.query = self.environ['QUERY_STRING']
         return template
 
     def getUserTemplate(self, templateName):
