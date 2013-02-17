@@ -195,6 +195,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             if bool(template.user['ismember']) is True:
                 template.error = "En tant qu'adhérent vous ne pouvez pas vous désinscrire de la liste Pancito"
+                syslog.syslog(syslog.LOG_ERR, "%s. User: %s. Params: %s" % (template.error, template.user, self.getQueryParameters()))
             elif bool(template.user['ismailing']) is False:
                 template.warning = "Vous êtes déjà désinscrit de la liste Pancito"
             else:
@@ -224,12 +225,16 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                 if d is None:
                     template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Data: %s. Params: %s" % (template.error, d, self.getQueryParameters()))
                 elif '@' not in d['email']:
                     template.error = "Veuillez saisir une adresse email valide"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Data: %s. Params: %s" % (template.error, d, self.getQueryParameters()))
                 elif not self.checkProducts():
                     template.error = "Veuillez préciser votre commande avec au moins un produit!"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Params: %s" % (template.error, self.getQueryParameters()))
                 elif bakeId is None:
                     template.error = "Veuillez sélectionner une date de distribution!"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Params: %s" % (template.error, self.getQueryParameters()))
 
                 if template.error is None:
                     bake = self.getBake(int(bakeId))
@@ -251,6 +256,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                         template.success = True
                     except sqlite3.IntegrityError:
                         template.error = "Votre commande a déjà été prise en compte"
+                        syslog.syslog(syslog.LOG_ERR, "%s. User: %s. Params: %s" % (template.error, user, self.getQueryParameters()))
 
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
@@ -292,10 +298,13 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                 if d is None:
                     template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Data: %s. Params: %s" % (template.error, d, self.getQueryParameters()))
                 elif '@' not in d['email']:
                     template.error = "Veuillez saisir une adresse email valide"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Data: %s. Params: %s" % (template.error, d, self.getQueryParameters()))
                 elif not self.checkProducts():
                     template.error = "Veuillez préciser votre commande hebdomadaire avec au moins un produit!"
+                    syslog.syslog(syslog.LOG_ERR, "%s. Params: %s" % (template.error, self.getQueryParameters()))
 
                 if template.error is None:
                     try:
@@ -349,6 +358,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
                     except db.EmailAlreadyExists:
                         template.error = "L'adresse email que vous avez renseigné existe déjà.  L'inscription a déjà été effectuée."
+                        syslog.syslog(syslog.LOG_ERR, "%s. Params: %s" % (template.error, self.getQueryParameters()))
 
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
