@@ -68,6 +68,29 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
     def addHeader(self, name, value):
         self.headers.append((name, value))
 
+    def getRegistration(self, fields):
+        d = {}
+        for f in fields:
+            p = self.getQueryParameters().getfirst(f)
+            if p is None:
+                return None
+            v = p.strip().decode('utf8')
+            if v is None:
+                return None
+            d[f] = v
+        return d
+
+    def checkProducts(self):
+        for product in self.getProducts():
+            v = self.getQueryParameters().getfirst("product.%s" % product['id'])
+            if v is not None:
+                try:
+                    if int(v) > 0:
+                        return True
+                except:
+                    return False
+        return False
+
     def handleRequest(self):
         try:
             value = self.processRequest()
@@ -181,6 +204,57 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
 
+        if uri == "/oneTime" :
+            template = self.getTemplate("oneTime")
+            self.conn = opendb()
+
+            # FIXME choose contract with newadhesion = True
+            openContract = 3
+            template.contract = self.getContract(openContract)
+            template.futureBakes = list(self.getFutureBakes(openContract))
+            if len(template.futureBakes) == 0:
+                raise Exception("No future bakes")
+
+            template.products = self.getProducts()
+
+            if method == "POST":
+                fields = ('name', 'email', 'comment')
+                d = self.getRegistration(fields)
+                bakeId = params.getfirst('bake')
+
+                if d is None:
+                    template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
+                elif '@' not in d['email']:
+                    template.error = "Veuillez saisir une adresse email valide"
+                elif not self.checkProducts():
+                    template.error = "Veuillez préciser votre commande avec au moins un produit!"
+                elif bakeId is None:
+                    template.error = "Veuillez sélectionner une date de distribution!"
+
+                if template.error is None:
+                    bake = self.getBake(int(bakeId))
+                    user = self.getUserByEmail(d['email'])
+                    if user is None:
+                        rowid = self.register(fields, d)
+                        user = self.getUser(rowid)
+
+                    try:
+                        for product in template.products:
+                            try:
+                                qty = int(params.getfirst("product.%s" % product['id']))
+                            except:
+                                qty = 0
+                            self.addBakeOrder(user['id'], bake['rowid'], product['id'], qty)
+
+                        self.conn.commit()
+                        template.bake = bake
+                        template.success = True
+                    except sqlite3.IntegrityError:
+                        template.error = "Votre commande a déjà été prise en compte"
+
+            self.addHeader("Content-Type", "text/html; charset=utf-8")
+            return unicode(template).encode('utf-8')
+
         if uri == "/register" :
             userId = None
             contractId = None
@@ -212,38 +286,15 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             template.products = self.getProducts()
 
-            def checkProducts():
-                for product in self.getProducts():
-                    v = params.getfirst("product.%s" % product['id'])
-                    if v is not None:
-                        try:
-                            if int(v) > 0:
-                                return True
-                        except:
-                            return False
-                return False
-
-            def getRegistration(fields):
-                d = {}
-                for f in fields:
-                    p = params.getfirst(f)
-                    if p is None:
-                        return None
-                    v = p.strip().decode('utf8')
-                    if v is None:
-                        return None
-                    d[f] = v
-                return d
-
             if method == "POST":
                 fields = ('name', 'email', 'address', 'postcode', 'locality', 'phone', 'comment')
-                d = getRegistration(fields)
+                d = self.getRegistration(fields)
 
                 if d is None:
                     template.error = "Veuillez vérifier que tous les champs sont bien renseignés!"
                 elif '@' not in d['email']:
                     template.error = "Veuillez saisir une adresse email valide"
-                elif not checkProducts():
+                elif not self.checkProducts():
                     template.error = "Veuillez préciser votre commande hebdomadaire avec au moins un produit!"
 
                 if template.error is None:
@@ -301,11 +352,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
         if uri == "/emailConfirmation":
             template = self.getUserTemplate("emailConfirmation")
-            # FIXME choose contract with newadhesion = True
-            openContract = 3
-            template.contract = self.getContract(openContract)
             self.confirmEmail(template.user['id'])
-            template.futureBakes = list(self.getFutureBakes(openContract))
             self.addHeader("Content-Type", "text/html; charset=utf-8")
             return unicode(template).encode('utf-8')
 

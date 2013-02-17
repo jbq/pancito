@@ -1,21 +1,115 @@
-<div class="main">
-    <h2>Si vous ne souhaitez pas adhérer tout de suite</h2>
-    <div class="content">
-#if len($futureBakes) > 0
-<div class="text">
-	<p>Si vous souhaitez goûter le pain et tester le fonctionnement d'une
-distribution avant de signer un contrat d'adhésion, voici les prochaines dates
-où vous pourrez nous rencontrer.   Veuillez sélectionner celle qui vous
-convient pour passer commande:</p>
+#encoding utf-8
+#import base
+#extends base.base
 
-<ul>
-#for $bake in $futureBakes[:4]
-<li><a href="order?b=${bake.rowid}&amp;userId=${params.getfirst('userId')}&amp;t=${params.getfirst('t')}">$bake.bakedate.strftime("%A %d %B %Y")</a></li>
-#end for
-</ul>
+#def field(k)
+${params.getfirst(k)}
+#end def
 
+#def content
+<h1>Commande d'essai</h1>
+#if $success
+<div class="success">Votre commande a bien été prise en compte, votre pain sera
+préparé pour le $bake.bakedate.strftime("%A %d %B %Y").</div>
+#elif not $error
+<div class="info">
+Vous souhaitez goûter le pain et tester le fonctionnement d'une
+distribution avant de signer un contrat d'adhésion?
+Veuillez saisir votre nom et adresse email,
+et sélectionner la date de distribution qui vous convient.
 <p><b>La distribution a lieu aux dates indiquées, ${contract.timeslot} ${contract.place}.</b></p>
+</div>
+#end if
+
+<form method="POST" accept-charset="UTF-8">
+  <div class="main">
+    <h2>Vos coordonnées</h2>
+    <div class="content">
+      <table class="order">
+        <tr>
+          <td width="30%">Nom complet</td>
+          <td>
+#if $success
+          $field('name')
+#else
+            <input type='text' name='name' size="40" value="$field('name')">
+            <span class="note">Par exemple: <i>M. et Mme Durand</i>, <i>Alain
+Maubert</i>, <i>Famille Truchaud</i>…</span>
+#end if
+          </td>
+        </tr>
+        <tr>
+          <td>Email</td>
+          <td>
+#if $success
+          <tt>$field('email')</tt>
+#else
+            <input type='text' name='email' size="40" value="$field('email')">
+#end if
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="main">
+    <h2>Comment avez-vous connu Pancito?</h2>
+
+    <div class="content">
+#if $success
+          $field('comment')
+#else
+      <textarea style="width: 100%" cols='40' name='comment'>$field('comment')</textarea>
 #end if
     </div>
-</div>
-</div>
+  </div>
+
+  <div class="main">
+    <h2>Commande</h2>
+
+    <div class="content">
+      <table class="order">
+<tr>
+<td>Date</td>
+<td>
+#if $success
+          $bake.bakedate.strftime("%A %d %B %Y")
+#else
+<select name="bake">
+#for $bake in $futureBakes[:4]
+<option value="${bake.rowid}">$bake.bakedate.strftime("%A %d %B %Y")</option>
+#end for
+</select>
+#end if
+</tr>
+        #for i, product in enumerate($products)
+        <tr>
+          <td>
+            <i>
+            $product.name &ndash; $displayAmount($product.itemprice) € l'unité
+            </i>
+          </td>
+          <td>
+            Quantité:&nbsp;
+#if $success
+            ${params.getfirst("product.%s" % $product.id)}
+#else
+            <input type="text" size="2" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or 0}">
+#end if
+          </td>
+        </tr>
+        #end for
+#if not $success
+        <tr>
+          <td class="submit" colspan=2>
+            <div style="text-align: right">
+              <input type="submit" value="Enregistrer">
+            </div>
+          </td>
+        </tr>
+#end if
+      </table>
+    </div>
+  </div>
+</form>
+#end def

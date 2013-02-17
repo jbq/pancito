@@ -251,6 +251,8 @@ class DBManager(object):
         return c.fetchone()
 
     def toDisplayUser(self, row):
+        if row is None:
+            return None
         d = dict(row)
         d['currentAdhesion'] = self.getCurrentAdhesion(row['id'])
         d['adhesions'] = list(self.getUserAdhesionList(row['id']))
@@ -259,6 +261,8 @@ class DBManager(object):
         return d
 
     def toDisplayBake(self, row):
+        if row is None:
+            return None
         d = dict(row)
         d['bakedatetime'] = datetime.datetime.strptime(d['bakedate'], "%Y-%m-%d")
         d['bakedate'] = d['bakedatetime'].date()
@@ -323,6 +327,12 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("SELECT * from contract WHERE id = ?", (contractId,))
         return self.toDisplayContract(c.fetchone())
+
+    def getUserByEmail(self, email):
+        assert isinstance(email, basestring)
+        c = self.conn.cursor()
+        c.execute("SELECT * from user WHERE email = ?", (email,))
+        return self.toDisplayUser(c.fetchone())
 
     def getUser(self, userId):
         assert isinstance(userId, int)
