@@ -94,7 +94,7 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
 #if $success
             ${params.getfirst("product.%s" % $product.id)}
 #else
-            <input type="text" size="2" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id) or 0}">
+            <input type="text" size="2" name="product.${product.id}" value="${params.getfirst("product.%s" % $product.id)}">
 #end if
           </td>
         </tr>
