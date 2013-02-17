@@ -368,7 +368,7 @@ class DBManager(object):
 
     def setUserMailing(self, user, mailing):
         assert isinstance(mailing, bool), "Expecting %s for mailing param, got %s" % (bool, type(mailing))
-        assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
+        assert isinstance(user, dict), "Expecting %s for user param, got %s" % (dict, type(user))
         c = self.conn.cursor()
         c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE id = ?", (mailing, user['id'],))
         self.conn.commit()
