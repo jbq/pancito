@@ -307,6 +307,9 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                             if template.user['email'] != d['email']:
                                 email = True
                                 self.resetEmail(userId)
+                            elif template.user['email_confirm_time'] is None:
+                                # In case account was created from /oneTime form
+                                email = True
                             else:
                                 email = False
 
