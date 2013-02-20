@@ -425,18 +425,19 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             # contract id is included in token
             verifyToken(template.user, params.getfirst('t'), params.getfirst('c'))
             template.products = self.getProducts()
-            template.adhesionOrders = self.getAdhesionOrders(userId, contractId)
-            if len(template.adhesionOrders) == 0:
-                template.adhesionOrders = self.getAdhesionOrders(userId)
-                if len(template.adhesionOrders) == 0:
-                    raise Exception("No orders for contract %s and user %s" % (contractId, userId))
-            template.adhesion = self.getAdhesion(userId, contractId)
 
             if method == "POST":
                 editedBakes = self.getEditedBakes()
                 self.processBakeOrders(editedBakes, userId)
                 self.conn.commit()
                 template.success = True
+
+            template.adhesionOrders = self.getAdhesionOrders(userId, contractId)
+            if len(template.adhesionOrders) == 0:
+                template.adhesionOrders = self.getAdhesionOrders(userId)
+                if len(template.adhesionOrders) == 0:
+                    raise Exception("No orders for contract %s and user %s" % (contractId, userId))
+            template.adhesion = self.getAdhesion(userId, contractId)
 
             displayedBakes = list(self.getBakes(contractId))
             template.bakes = list(self.buildBakesWithOrders(displayedBakes, userId))
