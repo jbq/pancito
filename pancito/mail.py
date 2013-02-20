@@ -42,7 +42,7 @@ def mail_template(user, t, contract=None):
     return content.encode('utf-8')
 
 def writeMail(user, mailData):
-    assert isinstance(user, sqlite3.Row), "Expecting %s for user param, got %s" % (sqlite3.Row, type(user))
+    assert isinstance(user, dict), "Expecting %s for user param, got %s" % (dict, type(user))
 
     with open(os.path.join(maildir(), "%03u" % user['id']), "w") as f:
         f.write(mailData)

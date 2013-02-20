@@ -5,7 +5,7 @@ import pancito.mail, pancito.db
 import getopt, Cheetah.Template
 
 conditions = []
-contract = None
+forceContract = None
 options, args = getopt.getopt(sys.argv[1:], "mnc:p:", ("members", "non-members", "user-contract=", "no-user-contract=", "contract=", "place="))
 for option, value in options:
     if option in ("-m", "--members"):
@@ -29,7 +29,7 @@ for option, value in options:
         contractId = int(value)
         conn = pancito.opendb()
         db = pancito.db.DBManager(conn)
-        contract = db.getContract(contractId)
+        forceContract = db.getContract(contractId)
     elif option in ("-p", "--place"):
         # Provide a default value, as --user-contract is more precise
         conditions.append("place_id = %s" % int(value))
@@ -42,5 +42,11 @@ conn = pancito.opendb()
 c = conn.cursor()
 c.execute("SELECT * FROM user WHERE %s" % " AND ".join(conditions))
 t = Cheetah.Template.Template(file=template)
-for user in c.fetchall():
+db = pancito.db.DBManager(conn)
+for row in c.fetchall():
+    user = db.toDisplayUser(row)
+    if forceContract is None:
+        contract = db.getContract(user['currentAdhesion']['contract_id'])
+    else:
+        contract = forceContract
     pancito.mail.writeMail(user, pancito.mail.mail_template(user, t, contract))
