@@ -93,6 +93,7 @@ class DBManager(object):
         d['orderAmount'] = self.computeOrderAmount(adhesion)
         paidAmount = adhesion['amount'] + d['extraAmount']
         d['balance'] = paidAmount - d['orderAmount']
+        d['debugBalance'] = "%s + %s - %s" % (adhesion['amount'], d['extraAmount'], d['orderAmount'])
         d['displayBalance'] = pancito.displayAmount(d['balance'])
         d['displayAmount'] = pancito.displayAmount(paidAmount)
         d['displayOrderAmount'] = pancito.displayAmount(d['orderAmount'])
@@ -473,7 +474,8 @@ class DBManager(object):
 
     def getCurrentAdhesion(self, userId):
         c = self.conn.cursor()
-        c.execute("SELECT * FROM adhesion WHERE user_id = ? AND contract_id IN (SELECT id FROM contract WHERE enddate >= current_date)", (userId,))
+        c.execute("SELECT * FROM adhesion INNER JOIN contract ON contract.id = contract_id WHERE user_id = ? ORDER BY enddate DESC LIMIT 1", (userId,))
+
         if c.rowcount == 0:
             return None
         return self.toDisplayAdhesion(c.fetchone())
