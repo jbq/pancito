@@ -4,6 +4,7 @@
 
 #def content
 #set printSty = $params.getfirst('print')
+#set extraParams = '&amp;%s' % $query
 <div class="main">
 <div class="content">
 <table class="poll">
@@ -74,7 +75,7 @@ $user.place.nickname
 #end if
 			<td>
 #if not $printSty
-			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1">Orders</a>
+			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1$extraParams">Orders</a>
 #if $user.currentAdhesion
 #set $contractId = $user.currentAdhesion.contract_id
 #elif $user.place_id
