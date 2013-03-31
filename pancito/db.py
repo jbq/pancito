@@ -233,6 +233,7 @@ class DBManager(object):
         for field in ('startdate', 'enddate'):
             d['%stime'%field] = datetime.datetime.strptime(d[field], "%Y-%m-%d")
             d[field] = d['%stime'%field].date()
+        d['place'] = self.getPlace(row['place_id'])
         return d
 
     def getContractsByPlace(self):

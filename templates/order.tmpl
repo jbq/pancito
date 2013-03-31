@@ -27,7 +27,7 @@ $success
   #set $orders = $bake.orders.get($user.id) or {}
   <div class="main past-$past">
     <h2>Fournée du $bake.bakedate.strftime("%A %d %B %Y")
-<div class="note">Distribution $bake.contract.place</div>
+<div class="note">Distribution $bake.contract.place.name</div>
 </h2>
     <div class="content">
       #if $bake.initialOrders.get($user.id) and $active
