@@ -11,11 +11,12 @@
 <table class="poll">
 	<thead>
 		<tr>
-			<td colspan=2>
 #if not $printSty
+			<td colspan=3>
 #if not $debug
 <div class="note"><a href="?$query&amp;db=1">Debug balance</a></div>
 #else
+			<td colspan=2>
 <div class="note"><a href="?db=0&amp;$query">Debug balance</a></div>
 #end if
 <div class="note"><a href="?$query&amp;zb=0">Hide zero balance</a></div>
@@ -49,6 +50,11 @@
 #set $hideZeroBalance = ($params.getfirst('zb') == "0")
 #if not($hideZeroBalance) or $hideZeroBalance and $balance != 0
 		<tr>
+#if not $printSty
+			<td>
+			<tt>$user.id</tt>
+			</td>
+#end if
 			<td class="pname member-$user.ismember mailing-$user.ismailing">
 			${$user.name or $user.email}
 			</td>
