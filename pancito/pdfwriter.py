@@ -6,6 +6,7 @@ from itools.odf.odf import stl_to_odt, ODTFile
 import pancito
 import os.path
 import subprocess
+import syslog
 
 class Struct:
     def __init__(self, **entries):
@@ -31,6 +32,7 @@ class ContractGenerator:
 
         info = Struct(**user)
         info.update(**contract)
+        info.placeName = contract['place']['name']
         info.date = date.today().strftime("%d %B %Y")
         c.execute("SELECT count(*) FROM bake WHERE contract_id = ?", (contract['id'],))
         info.bakeCount = c.fetchone()[0]
@@ -43,6 +45,7 @@ class ContractGenerator:
             orderAmount += order['quantity'] * order['itemprice']
         info.order = " et ".join(orderdisplays)
         info.balance = pancito.displayAmount(orderAmount - extraAmount)
+        syslog.syslog(syslog.LOG_DEBUG, "Contract info: %s" % repr(info.__dict__))
 
         rw_database = RWDatabase(fs=lfs)
         handler = rw_database.get_handler(os.path.join(pancito.datadir, 'model.odt'))
