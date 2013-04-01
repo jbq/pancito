@@ -12,13 +12,20 @@ ${params.getfirst(k)}
 
 #def content
 #set printSty = $params.getfirst('print')
+#set contractId = $params.getfirst('c')
 #if not($success or $error)
 #if $printSty
 <h1>Formulaire d'inscription</h1>
 #else
+#if not $user
 <p class="info">Vous êtes intéressé(e) par nos distributions de pain? Veuillez
 renseigner ce formulaire d'inscription, puis cliquez sur le bouton
 <i>Enregistrer</i></p>
+#elif $contractId
+<p class="info">Veuillez vérifier les informations sur ce formulaire, puis
+<b>cliquez sur le bouton Enregistrer pour passer au calendrier de
+distribution</b>.</p>
+#end if
 #end if
 #else if $success
 #if $emailSent
@@ -34,7 +41,7 @@ notre email, il s'agit probablement d'une erreur de saisie, dans ce cas
 
 <form method="POST" accept-charset="UTF-8">
 #* hidden fields to propagate optional parameters *#
-<input type="hidden" name="c" value="$params.getfirst('c')">
+<input type="hidden" name="c" value="$contractId">
 <input type="hidden" name="u" value="$params.getfirst('u')">
 
   <div class="main">
@@ -142,7 +149,7 @@ $field('phone')
         <tr>
           <td class="submit" colspan=2>
             <div style="text-align: right">
-              <input type="submit" value="Enregistrer">
+		$submit
             </div>
           </td>
         </tr>
