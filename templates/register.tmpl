@@ -109,6 +109,7 @@ $field('phone')
     </div>
   </div>
 
+#if not $user or not $user.comment
   <div class="main">
     <h2>Comment avez-vous connu Pancito?</h2>
 
@@ -116,6 +117,9 @@ $field('phone')
       <textarea style="width: 100%" cols='40' name='comment'>$field('comment')</textarea>
     </div>
   </div>
+#else
+<input type="hidden" name="comment" value="$field('comment')">
+#end if
 
   <div class="main">
     <h2>Commande hebdomadaire, à titre indicatif
