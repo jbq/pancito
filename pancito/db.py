@@ -91,11 +91,17 @@ class DBManager(object):
         d = self.toDisplayCreationTime(adhesion)
         d['extraAmount'] = self.computeExtraAmount(adhesion)
         d['orderAmount'] = self.computeOrderAmount(adhesion)
-        paidAmount = adhesion['amount'] + d['extraAmount']
+        paidAmount = d['extraAmount']
+
+        if d['paperwork_verified'] is not None:
+            paidAmount += adhesion['amount']
+
         d['balance'] = paidAmount - d['orderAmount']
         d['debugBalance'] = "%s + %s - %s" % (adhesion['amount'], d['extraAmount'], d['orderAmount'])
         d['displayBalance'] = pancito.displayAmount(d['balance'])
-        d['displayAmount'] = pancito.displayAmount(paidAmount)
+        d['displayPaidAmount'] = pancito.displayAmount(paidAmount)
+        d['displayAmount'] = pancito.displayAmount(adhesion['amount'])
+        d['displayExtraAmount'] = pancito.displayAmount(d['extraAmount'])
         d['displayOrderAmount'] = pancito.displayAmount(d['orderAmount'])
         return d
 
@@ -465,7 +471,7 @@ class DBManager(object):
         c = self.conn.cursor()
         c.execute("SELECT * FROM extra_payment WHERE user_id = ?", (userId,))
         for row in c.fetchall():
-            yield self.toDisplayAdhesion(row)
+            yield row
 
     def getUserAdhesionList(self, userId):
         c = self.conn.cursor()

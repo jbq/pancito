@@ -49,18 +49,24 @@ Merci!</b>
 <div class="content">
 <table class='order'>
 <tr>
-<td width="30%"><b>Paiements effectués</b></td>
+<td width="30%"><b>Montant de l'adhésion</b></td>
 <td>$adhesion.displayAmount €
 #if $adhesion.paperwork_verified is None
 <span class="negative">En attente de règlement</span>
 #end if
 </td>
 </tr>
+#if $adhesion.extraAmount != 0
+<tr>
+<td width="30%"><b>Paiements complémentaires</b></td>
+<td>$adhesion.displayExtraAmount €
+</td>
+</tr>
+#end if
 <tr>
 <td width="30%"><b>Montant de la commande</b></td>
 <td>$adhesion.displayOrderAmount €</td>
 </tr>
-#if $adhesion.paperwork_verified
 <tr>
 <td width="30%"><b>Solde</b></td>
 <td>
@@ -71,7 +77,6 @@ $adhesion.displayBalance €
 #end if
 </td>
 </tr>
-#end if
 </table>
 </div>
 </div>
