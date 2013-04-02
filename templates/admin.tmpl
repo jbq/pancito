@@ -6,17 +6,21 @@
 #set printSty = $params.getfirst('print')
 #set debug = ($params.getfirst('db') == '1')
 #set extraParams = '&amp;%s' % $query
+#if $printSty
+#set colspan = 2
+#else
+#set colspan = 3
+#end if
 <div class="main">
 <div class="content">
 <table class="poll">
 	<thead>
 		<tr>
+			<td colspan=$colspan>
 #if not $printSty
-			<td colspan=3>
 #if not $debug
 <div class="note"><a href="?$query&amp;db=1">Debug balance</a></div>
 #else
-			<td colspan=2>
 <div class="note"><a href="?db=0&amp;$query">Debug balance</a></div>
 #end if
 <div class="note"><a href="?$query&amp;zb=0">Hide zero balance</a></div>
@@ -118,7 +122,7 @@ $user.place.nickname
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan=2>Total commandes</td>
+			<td colspan=$colspan>Total commandes</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			$sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()])
@@ -129,7 +133,7 @@ $user.place.nickname
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan=2>Total pain cuit</td>
+			<td colspan=$colspan>Total pain cuit</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round((sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.7
@@ -141,7 +145,7 @@ $user.place.nickname
 		</tr>
 #if not $printSty
 		<tr>
-			<td colspan=2>Total pâte</td>
+			<td colspan=$colspan>Total pâte</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round(sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.875
@@ -152,7 +156,7 @@ $user.place.nickname
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan=2>Total levain</td>
+			<td colspan=$colspan>Total levain</td>
 			#for $bakeDate, $ordersByUser in $bakeOrdersByDate
 			<td>
 			${round((sum([$orders.get(1) or 0 for $orders in $ordersByUser.values()]) * 0.875
