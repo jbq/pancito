@@ -37,10 +37,15 @@ for option, value in options:
 if len(conditions) == 0:
     conditions.append("ismailing")
 
-template = args[0]
 conn = pancito.opendb()
 c = conn.cursor()
 c.execute("SELECT * FROM user WHERE %s" % " AND ".join(conditions))
+if len(args) == 0:
+    for row in c.fetchall():
+        print row
+    sys.exit(0)
+
+template = args[0]
 t = Cheetah.Template.Template(file=template)
 db = pancito.db.DBManager(conn)
 for row in c.fetchall():
