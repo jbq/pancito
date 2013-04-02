@@ -89,7 +89,7 @@ class DBManager(object):
         if adhesion is None:
             return None
         d = self.toDisplayCreationTime(adhesion)
-        d['extraAmount'] = self.computeExtraAmount(adhesion)
+        d['extraAmount'] = self.computeExtraAmount(adhesion['contract_id'], adhesion['user_id'])
         d['orderAmount'] = self.computeOrderAmount(adhesion)
         paidAmount = d['extraAmount']
 
@@ -105,9 +105,9 @@ class DBManager(object):
         d['displayOrderAmount'] = pancito.displayAmount(d['orderAmount'])
         return d
 
-    def computeExtraAmount(self, adhesion):
+    def computeExtraAmount(self, contract_id, user_id):
         c = self.conn.cursor()
-        c.execute("SELECT coalesce(sum(amount), 0) FROM extra_payment WHERE contract_id = ? AND user_id = ?", (adhesion['contract_id'], adhesion['user_id']))
+        c.execute("SELECT coalesce(sum(amount), 0) FROM extra_payment WHERE contract_id = ? AND user_id = ?", (contract_id, user_id))
         return c.fetchone()[0]
 
     def computeOrderAmount(self, adhesion):

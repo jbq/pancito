@@ -422,6 +422,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             template.user = self.getUser(userId)
             template.contract = self.getContract(contractId)
+            template.extraAmount = self.computeExtraAmount(contractId, userId)
+            template.displayExtraAmount = displayAmount(template.extraAmount)
             # contract id is included in token
             verifyToken(template.user, params.getfirst('t'), params.getfirst('c'))
             template.products = self.getProducts()
