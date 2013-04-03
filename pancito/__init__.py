@@ -159,9 +159,9 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             displayedContractIds = params.getlist('dc')
             template.allOrdersByUser = self.getBakeOrdersByUser(displayedContractIds)
             displayedBakeIds = params.getlist('b')
-            displayedPlaces = params.getlist('p')
-            if len(displayedPlaces) == 0:
-                displayedPlaces = None
+            displayedPlaceIds = params.getlist('p')
+            if len(displayedPlaceIds) == 0:
+                displayedPlaceIds = None
             userCriteria = {}
             for option in params.getlist("du"):
                 for criterium in ('mailing', 'member', 'order'):
@@ -179,9 +179,10 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                     for x in displayedContracts:
                         displayedBakes += list(self.getBakes(x['id']))
                 else:
-                    displayedBakes = list(self.getFutureBakes(places=displayedPlaces))
+                    displayedBakes = list(self.getFutureBakes(places=displayedPlaceIds))
 
             userCriteria['bakes'] = displayedBakes
+            userCriteria['placeIds'] = displayedPlaceIds
             template.users = self.getUsers(**userCriteria)
 
             template.bakeOrdersByDate = list(self.bakeOrdersByDate(displayedBakes))

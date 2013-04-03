@@ -381,7 +381,7 @@ class DBManager(object):
         c.execute("UPDATE user SET ismailing = ?, unsubscribe_time=datetime('now') WHERE id = ?", (mailing, user['id'],))
         self.conn.commit()
 
-    def getUsers(self, ismailing=None, ismember=None, isorder=None, bakes=None):
+    def getUsers(self, ismailing=None, ismember=None, isorder=None, bakes=None, placeIds=None):
         c = self.conn.cursor()
         params = []
         conditions = ["1"]
@@ -398,6 +398,8 @@ class DBManager(object):
             else:
                 not_keyword = ' NOT'
             conditions.append("id%s IN (SELECT userid FROM bakeorder WHERE bakeid IN (%s))" % (not_keyword, ", ".join([str(x['rowid']) for x in bakes]),))
+        if placeIds is not None:
+            conditions.append("place_id IN (%s)" % ", ".join(placeIds))
         q = "SELECT * from user WHERE %s" % " AND ".join(conditions)
         c.execute(q, params)
         for row in c.fetchall():
