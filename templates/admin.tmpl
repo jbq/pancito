@@ -5,6 +5,7 @@
 #def content
 #set printSty = $params.getfirst('print')
 #set debug = ($params.getfirst('db') == '1')
+#set forceContractId = $params.getfirst('c')
 #set extraParams = '&amp;%s' % $query
 #if $printSty
 #set colspan = 2
@@ -99,7 +100,9 @@ $user.place.nickname
 			<td>
 #if not $printSty
 			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1$extraParams">Orders</a>
-#if $user.currentAdhesion
+#if $forceContractId
+#set $contractId = $forceContractId
+#elif $user.currentAdhesion
 #set $contractId = $user.currentAdhesion.contract_id
 #elif $user.place_id
 #set $contractId = $contractsByPlace[$user.place_id].id
