@@ -99,7 +99,7 @@ $user.place.nickname
 #end if
 			<td>
 #if not $printSty
-			<a href="/order?userId=${user.id}&amp;t=$genToken($user)&amp;admin=1$extraParams">Orders</a>
+			<a href="/order?u=${user.id}&amp;t=$genToken($user)&amp;admin=1$extraParams">Orders</a>
 #if $forceContractId
 #set $contractId = $forceContractId
 #elif $user.currentAdhesion

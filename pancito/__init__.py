@@ -136,7 +136,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         params = self.getQueryParameters()
 
         try:
-            userId = int(params.getfirst("userId"))
+            userId = int(params.getfirst("u"))
         except:
             raise BadRequest("No user id specified")
 
@@ -344,7 +344,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                             if userId is not None and contractId is not None:
                                 t.emailConfirmationUrl = 'http://m.pancito.fr%s&emailConfirmed=1' % adhesionUri
                             else:
-                                t.emailConfirmationUrl = 'http://m.pancito.fr/emailConfirmation?userId=%s&t=%s' % (user['id'], genToken(user))
+                                t.emailConfirmationUrl = 'http://m.pancito.fr/emailConfirmation?u=%s&t=%s' % (user['id'], genToken(user))
                             mail.sendMail(mail.mail_template(user, t))
 
                         self.conn.commit()

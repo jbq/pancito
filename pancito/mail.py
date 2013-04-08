@@ -28,8 +28,8 @@ def encodeHeader(v):
 def mail_template(user, t, contract=None):
     assert isinstance(t, Cheetah.Template.Template)
     assert isinstance(user, dict), "Expecting %s for user param, got %s" % (dict, type(user))
-    t.orderUrl = 'http://m.pancito.fr/order?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
-    t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?userId=%s&t=%s' % (user['id'], pancito.genToken(user))
+    t.orderUrl = 'http://m.pancito.fr/order?u=%s&t=%s' % (user['id'], pancito.genToken(user))
+    t.unsubscribeUrl = 'http://m.pancito.fr/unsubscribe?u=%s&t=%s' % (user['id'], pancito.genToken(user))
     if contract is not None:
         t.adhesionUrl = "http://m.pancito.fr/adhesion?u=%s&c=%s&t=%s" % (user['id'], contract['id'], pancito.genToken(user, contract['id']))
         t.registrationUrl = t.adhesionUrl.replace("adhesion", "register")
