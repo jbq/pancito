@@ -98,6 +98,7 @@ $user.place.nickname
 </td>
 #end if
 			<td>
+<div class="note">
 #if not $printSty
 			<a href="/order?u=${user.id}&amp;t=$genToken($user)&amp;admin=1$extraParams">Orders</a>
 #if $forceContractId
@@ -113,11 +114,15 @@ $user.place.nickname
 #set $token = $genToken($user, $contractId)
 			<a href="/register?u=${user.id}&amp;c=$contractId&amp;t=$token">Registration</a>
 			<a href="/adhesion?u=${user.id}&amp;c=$contractId&amp;t=$token">Adhesion</a>
+#if $user.currentAdhesion and $user.currentAdhesion.paperwork_verified is None
+			<a href='/admin/paperwork?u=${user.id}&amp;c=$contractId&amp;t=$token'>Paperwork checked</a>
+#end if
 #else
 #set $token = $genToken($user)
 			<a href="/register?u=${user.id}&amp;t=$token">Registration</a>
 #end if
 #end if
+</div>
 			</td>
 		</tr>
 #end if

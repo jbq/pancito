@@ -481,6 +481,10 @@ class DBManager(object):
         for row in c.fetchall():
             yield self.toDisplayAdhesion(row)
 
+    def setPaperworkVerified(self, userId, contractId):
+        c = self.conn.cursor()
+        c.execute("UPDATE adhesion SET paperwork_verified = datetime('now') WHERE user_id = ? and contract_id = ?", (userId, contractId))
+
     def getCurrentAdhesion(self, userId):
         c = self.conn.cursor()
         c.execute("SELECT * FROM adhesion INNER JOIN contract ON contract.id = contract_id WHERE user_id = ? ORDER BY enddate DESC LIMIT 1", (userId,))

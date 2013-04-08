@@ -153,7 +153,18 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         method = self.environ['REQUEST_METHOD']
         params = self.getQueryParameters()
 
-        if uri == "/admin/%s" % secretKey:
+        if uri == "/admin/paperwork":
+            userId = int(params.getfirst("u"))
+            contractId = int(params.getfirst('c'))
+            token = params.getfirst('t')
+            self.conn = opendb()
+            user = self.getUser(userId)
+            verifyToken(user, token, contractId)
+            self.setPaperworkVerified(userId, contractId)
+            self.conn.commit()
+            return
+
+        elif uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
             displayedContractIds = params.getlist('dc')
