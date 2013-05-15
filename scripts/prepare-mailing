@@ -46,12 +46,16 @@ if len(args) == 0:
     sys.exit(0)
 
 template = args[0]
-t = Cheetah.Template.Template(file=template)
 db = pancito.db.DBManager(conn)
 for row in c.fetchall():
+    # Reset template variables for each user
+    t = Cheetah.Template.Template(file=template)
     user = db.toDisplayUser(row)
-    if forceContract is None:
+    contract = None
+
+    if forceContract is None and user['currentAdhesion']:
         contract = db.getContract(user['currentAdhesion']['contract_id'])
     else:
         contract = forceContract
+
     pancito.mail.writeMail(user, pancito.mail.mail_template(user, t, contract))
