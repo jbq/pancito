@@ -348,6 +348,7 @@ class DBManager(object):
         c.execute("SELECT * from user WHERE id = ?", (userId,))
         return self.toDisplayUser(c.fetchone())
 
+    # FIXME we don't really need fields param, just use d.keys()
     def register(self, fields, d):
         assert isinstance(fields, (list, tuple))
         assert isinstance(d, dict)

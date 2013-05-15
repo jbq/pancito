@@ -231,7 +231,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template.products = self.getProducts()
 
             if method == "POST":
-                fields = ('name', 'email', 'comment')
+                fields = ['name', 'email', 'comment']
                 d = self.getRegistration(fields)
                 bakeId = params.getfirst('bake')
 
@@ -252,6 +252,10 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                     bake = self.getBake(int(bakeId))
                     user = self.getUserByEmail(d['email'])
                     if user is None:
+                        # Set new user's place_id based on chosen contract's place_id
+                        fields.append('place_id')
+                        d['place_id'] = template.contract['place_id']
+                        # FIXME we don't really need fields param, just use d.keys()
                         rowid = self.register(fields, d)
                         user = self.getUser(rowid)
 
@@ -322,6 +326,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                     try:
                         if userId is None:
                             email = True
+                            # FIXME we don't really need fields param, just use d.keys()
                             rowid = self.register(fields, d)
                             user = self.getUser(rowid)
                         else:
