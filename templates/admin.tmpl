@@ -93,7 +93,11 @@ $user.place.nickname
 #if not $user.currentAdhesion
 <span class="note">(hors adhésion)</span>
 #elif $user.currentAdhesion.paperwork_verified is None
+#if $printSty
+<span style="font-size: 11px">ANR</span>
+#else
 <span class="note">(En attente de règlement)</span>
+#end if
 #end if
 </td>
 #end if
