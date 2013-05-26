@@ -85,7 +85,7 @@ $user.place.nickname
 			#end if
 			#end for
 #if $hideZeroBalance or not $printSty
-<td>
+<td align="right">
 <span class="balance-${int($balance >= 0)}">$displayAmount($balance)</span>
 #if debug and $user.currentAdhesion
 = ($user.currentAdhesion.debugBalance) / 100
