@@ -48,9 +48,9 @@
 	<tbody>
 		#for $user in $users
 #if $user.currentAdhesion
-#set balance = $user.currentAdhesion.balance / 100
+#set balance = $user.currentAdhesion.balance
 #else
-#set balance = (sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])) / 100                                                    
+#set balance = sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])
 #end if
 #set $hideZeroBalance = ($params.getfirst('zb') == "0")
 #if not($hideZeroBalance) or $hideZeroBalance and $balance != 0
@@ -86,7 +86,7 @@ $user.place.nickname
 			#end for
 #if $hideZeroBalance or not $printSty
 <td>
-<span class="balance-${int($balance >= 0)}">$balance</span>
+<span class="balance-${int($balance >= 0)}">$displayAmount($balance)</span>
 #if debug and $user.currentAdhesion
 = ($user.currentAdhesion.debugBalance) / 100
 #end if
