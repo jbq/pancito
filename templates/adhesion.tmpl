@@ -169,10 +169,17 @@ $bake.bakedate.strftime("%A %d %B %Y")
 #if $active and not $success
     #if $order
         #set $qty = $order.quantity
+	#set $cssClass = ""
+	#set modified = False
     #else
         #set $qty = $adhesionOrder.quantity
+	#set modified = True
+	#set $cssClass = "modified"
     #end if
-    <input type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
+    <input class="$cssClass" type="text" name="bake.${bake.rowid}.${product.id}" value="$qty">
+#if $modified
+<span class="modified">&nbsp;*</span>
+#end if
 #else
     #if $order
         #set $qty = $order.quantity
