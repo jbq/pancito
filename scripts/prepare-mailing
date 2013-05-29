@@ -5,10 +5,14 @@ import pancito.mail, pancito.db
 import getopt, Cheetah.Template
 
 conditions = []
+bakeIds = []
 forceContract = None
-options, args = getopt.getopt(sys.argv[1:], "mnc:p:", ("members", "non-members", "user-contract=", "no-user-contract=", "contract=", "place="))
+noOrder = False
+options, args = getopt.getopt(sys.argv[1:], "mnc:p:b:", ("members", "non-members", "user-contract=", "no-user-contract=", "contract=", "place=", "no-order", "bake="))
 for option, value in options:
-    if option in ("-m", "--members"):
+    if option in ("-b", "--bake"):
+        bakeIds.append(value)
+    elif option in ("-m", "--members"):
         conditions.append("ismember")
     elif option in ("-n", "--non-members"):
         conditions.append("ismailing")
@@ -25,6 +29,8 @@ for option, value in options:
         # query, or bakeorder should repeat contract id
         conditions.append("ismember")
         conditions.append("id NOT IN (select userid from bakeorder where bakeid IN (select rowid from bake where contract_id = %s))" % noUserContractId)
+    elif option in ("--no-order",):
+        noOrder = True
     elif option in ("-c", "--contract"):
         contractId = int(value)
         conn = pancito.opendb()
@@ -34,13 +40,18 @@ for option, value in options:
         # Provide a default value, as --user-contract is more precise
         conditions.append("place_id = %s" % int(value))
 
+if noOrder:
+    conditions.append("id NOT IN (select userid from bakeorder where bakeid IN (%s))" % ", ".join(bakeIds))
+
 if len(conditions) == 0:
     conditions.append("ismailing")
 
 conn = pancito.opendb()
 c = conn.cursor()
-c.execute("SELECT * FROM user WHERE %s" % " AND ".join(conditions))
+q = "SELECT * FROM user WHERE %s" % " AND ".join(conditions)
+c.execute(q)
 if len(args) == 0:
+    print q
     for row in c.fetchall():
         print row
     sys.exit(0)
