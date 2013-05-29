@@ -85,7 +85,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             v = self.getQueryParameters().getfirst("product.%s" % product['id'])
             if v is not None:
                 try:
-                    if int(v) > 0:
+                    if int(v) >= 0:
                         return True
                 except:
                     return False
