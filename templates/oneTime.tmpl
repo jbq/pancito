@@ -56,11 +56,13 @@ Maubert</i>, <i>Famille Truchaud</i>…</span>
     <h2>Comment avez-vous connu Pancito?</h2>
 
     <div class="content">
+      <div class="content-body">
 #if $success
           $field('comment')
 #else
       <textarea style="width: 100%" cols='40' name='comment'>$field('comment')</textarea>
 #end if
+      </div>
     </div>
   </div>
 
