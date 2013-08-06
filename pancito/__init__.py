@@ -226,7 +226,10 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template.contract = self.getContract(openContract)
             template.futureBakes = list(self.getFutureBakes(openContract))
             if len(template.futureBakes) == 0:
-                raise Exception("No future bakes")
+                template = self.getTemplate("message")
+                template.error = "Pas de fournée prévue pour le moment, veuillez renouveler votre demande ultérieurement."
+                self.addHeader("Content-Type", "text/html; charset=utf-8")
+                return unicode(template).encode('utf-8')
 
             template.products = self.getProducts()
 
