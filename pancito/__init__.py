@@ -501,6 +501,11 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             template.products = self.getProducts()
             template.adhesionOrders = None
             try:
+                limit = int(params.getfirst('l'))
+            except:
+                limit = None
+
+            try:
                 contractId = int(params.getfirst('c'))
             except:
                 contractId = None
@@ -511,7 +516,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             if method == "GET":
                 editedBakes = list(self.getBakesForIds(params.getlist('b')))
                 if len(editedBakes) == 0:
-                    editedBakes = list(self.getFutureBakes(contractId))
+                    editedBakes = list(self.getFutureBakes(contractId, limit=limit))
                 initialBakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             elif method == "POST":
                 editedBakes = self.getEditedBakes()

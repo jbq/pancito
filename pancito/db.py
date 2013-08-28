@@ -271,7 +271,7 @@ class DBManager(object):
         d['contract'] = self.getContract(d['contract_id'])
         return d
 
-    def getFutureBakes(self, contractId=None, places=None):
+    def getFutureBakes(self, contractId=None, places=None, limit=None):
         c = self.conn.cursor()
         conditions = ["bakedate >= CURRENT_DATE"]
         if contractId is not None:
@@ -279,6 +279,8 @@ class DBManager(object):
         if places is not None:
             conditions.append("contract_id IN (SELECT id FROM contract where place_id IN (%s))" % ", ".join(places))
         q = "SELECT rowid, * from bake WHERE %s" % " AND ".join(conditions)
+        if limit is not None:
+            q = "%s LIMIT %s" % (q, limit)
         c.execute(q)
         for row in c.fetchall():
             yield self.toDisplayBake(row)
