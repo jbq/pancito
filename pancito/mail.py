@@ -33,6 +33,7 @@ def mail_template(user, t, contract=None):
     if contract is not None:
         t.adhesionUrl = "http://m.pancito.fr/adhesion?u=%s&c=%s&t=%s" % (user['id'], contract['id'], pancito.genToken(user, contract['id']))
         t.registrationUrl = t.adhesionUrl.replace("adhesion", "register")
+        t.orderUrl += "&c=%s" % contract['id']
 
     t.contract = contract
     t.email = user['email']
