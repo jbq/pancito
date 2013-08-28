@@ -315,7 +315,7 @@ class DBManager(object):
 
     def getProducts(self):
         c = self.conn.cursor()
-        c.execute("SELECT * from product")
+        c.execute("SELECT * from product WHERE active")
         return c.fetchall()
 
     def getBake(self, bakeId):
