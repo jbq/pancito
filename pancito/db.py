@@ -89,20 +89,14 @@ class DBManager(object):
         if adhesion is None:
             return None
         d = self.toDisplayCreationTime(adhesion)
-        d['extraAmount'] = self.computeExtraAmount(adhesion['contract_id'], adhesion['user_id'])
-        d['orderAmount'] = self.computeOrderAmount(adhesion)
-        paidAmount = d['extraAmount']
+        paidAmount = 0
 
         if d['paperwork_verified'] is not None:
             paidAmount += adhesion['amount']
 
-        d['balance'] = paidAmount - d['orderAmount']
-        d['debugBalance'] = "%s + %s - %s" % (adhesion['amount'], d['extraAmount'], d['orderAmount'])
-        d['displayBalance'] = pancito.displayAmount(d['balance'])
+        d['paidAmount'] = paidAmount
         d['displayPaidAmount'] = pancito.displayAmount(paidAmount)
         d['displayAmount'] = pancito.displayAmount(adhesion['amount'])
-        d['displayExtraAmount'] = pancito.displayAmount(d['extraAmount'])
-        d['displayOrderAmount'] = pancito.displayAmount(d['orderAmount'])
         return d
 
     def computeExtraAmount(self, contract_id, user_id):
@@ -110,9 +104,9 @@ class DBManager(object):
         c.execute("SELECT coalesce(sum(amount), 0) FROM extra_payment WHERE contract_id = ? AND user_id = ?", (contract_id, user_id))
         return c.fetchone()[0]
 
-    def computeOrderAmount(self, adhesion):
+    def computeOrderAmount(self, contract_id, user_id):
         c = self.conn.cursor()
-        c.execute("SELECT sum(quantity) AS quantity, * FROM bakeorder INNER JOIN bake ON bake.rowid = bakeid INNER JOIN product ON product.id = productid WHERE contract_id = ? AND userid = ? GROUP BY productid", (adhesion['contract_id'], adhesion['user_id']))
+        c.execute("SELECT sum(quantity) AS quantity, * FROM bakeorder INNER JOIN bake ON bake.rowid = bakeid INNER JOIN product ON product.id = productid WHERE contract_id = ? AND userid = ? GROUP BY productid", (contract_id, user_id))
         orders = c.fetchall()
 
         orderAmount = 0

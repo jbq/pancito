@@ -117,6 +117,25 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
         return self.__params
 
+    def computeWallet(self, contractId, userId):
+        if contractId is None:
+            return None
+
+        d = {}
+        adhesion = self.getAdhesion(userId, contractId)
+        d['adhesion'] = adhesion
+        d['extraAmount'] = self.computeExtraAmount(contractId, userId)
+        d['displayExtraAmount'] = displayAmount(d['extraAmount'])
+        d['orderAmount'] = self.computeOrderAmount(contractId, userId)
+        d['displayOrderAmount'] = displayAmount(d['orderAmount'])
+        if adhesion is None:
+            d['balance'] = d['extraAmount'] - d['orderAmount']
+        else:
+            d['balance'] = adhesion['paidAmount'] + d['extraAmount'] - d['orderAmount']
+        d['displayBalance'] = displayAmount(d['balance'])
+
+        return d
+
     def getTemplate(self, t):
         template = Cheetah.Template.Template(file=os.path.join(root, "templates/%s.tmpl" % t))
         template.error = None
@@ -167,6 +186,12 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
         elif uri == "/admin/%s" % secretKey:
             self.conn = opendb()
             template=self.getTemplate("admin")
+
+            try:
+                contractId = int(params.getfirst('c'))
+            except:
+                contractId = None
+
             displayedContractIds = params.getlist('dc')
             template.allOrdersByUser = self.getBakeOrdersByUser(displayedContractIds)
             displayedBakeIds = params.getlist('b')
@@ -194,7 +219,9 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             userCriteria['bakes'] = displayedBakes
             userCriteria['placeIds'] = displayedPlaceIds
-            template.users = self.getUsers(**userCriteria)
+            template.users = list(self.getUsers(**userCriteria))
+            for user in template.users:
+                user['wallet'] = self.computeWallet(user['id'], contractId)
 
             template.bakeOrdersByDate = list(self.bakeOrdersByDate(displayedBakes))
             template.bakes = displayedBakes
@@ -442,8 +469,7 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
 
             template.user = self.getUser(userId)
             template.contract = self.getContract(contractId)
-            template.extraAmount = self.computeExtraAmount(contractId, userId)
-            template.displayExtraAmount = displayAmount(template.extraAmount)
+
             # contract id is included in token
             verifyToken(template.user, params.getfirst('t'), params.getfirst('c'))
             template.products = self.getProducts()
@@ -459,7 +485,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 template.adhesionOrders = self.getAdhesionOrders(userId)
                 if len(template.adhesionOrders) == 0:
                     raise Exception("No orders for contract %s and user %s" % (contractId, userId))
-            template.adhesion = self.getAdhesion(userId, contractId)
+
+            template.wallet = self.computeWallet(contractId, userId)
 
             displayedBakes = list(self.getBakes(contractId))
             template.bakes = list(self.buildBakesWithOrders(displayedBakes, userId))
@@ -478,6 +505,8 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             except:
                 contractId = None
 
+            userId = template.user['id']
+
             initialBakes = None
             if method == "GET":
                 editedBakes = list(self.getBakesForIds(params.getlist('b')))
@@ -488,9 +517,11 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
                 editedBakes = self.getEditedBakes()
                 # Don't display existing order warning when we do a POST
                 initialBakes = None
-                self.processBakeOrders(editedBakes, template.user['id'])
+                self.processBakeOrders(editedBakes, userId)
                 self.conn.commit()
                 template.success = u"Votre commande a bien été prise en compte, merci!"
+
+            template.wallet = self.computeWallet(contractId, userId)
 
             template.bakes = list(self.buildBakesWithOrdersByUser(editedBakes))
             for i, bake in enumerate(template.bakes):

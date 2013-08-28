@@ -5,6 +5,48 @@ ${params.getfirst(k)}
 #def submit
       <input class="submit" type="image" value="Enregistrer" width="140px" src="http://dl.dropbox.com/u/5836407/Pancito/Enregistrer.png">
 #end def
+
+#def walletDetails
+<div class="main aux">
+<h2>Porte-monnaie Pain</h2>
+<div class="content">
+<table class='order'>
+#if $wallet.adhesion
+  <tr>
+  <td width="30%"><b>Montant de l'adhésion</b></td>
+  <td>$wallet.adhesion.displayAmount €
+  #if $wallet.adhesion.paperwork_verified is None
+    <span class="negative">En attente de règlement</span>
+  #end if
+  </td>
+  </tr>
+#end if
+#if $wallet.extraAmount != 0
+  <tr>
+  <td width="30%"><b>Paiements complémentaires</b></td>
+  <td>$wallet.displayExtraAmount €
+  </td>
+  </tr>
+#end if
+<tr>
+<td width="30%"><b>Montant de la commande</b></td>
+<td>$wallet.displayOrderAmount €</td>
+</tr>
+<tr>
+<td width="30%"><b>Solde</b></td>
+<td>
+#if $wallet.balance >= 0
+  $wallet.displayBalance €
+#else
+  <span class="negative">$wallet.displayBalance €</span>
+#end if
+</td>
+</tr>
+</table>
+</div>
+</div>
+#end def
+
 <html>
 <head>
 #block head

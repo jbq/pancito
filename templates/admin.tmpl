@@ -48,7 +48,7 @@
 	<tbody>
 		#for $user in $users
 #if $user.currentAdhesion
-#set balance = $user.currentAdhesion.balance
+#set balance = $user.balance
 #else
 #set balance = sum([x['amount'] for x in $user.extra_payments]) - sum([x['amount'] for x in $allOrdersByUser.get($user.id) or []])
 #end if

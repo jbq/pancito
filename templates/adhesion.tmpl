@@ -43,53 +43,8 @@ Merci!</b>
 </div>
 #end if
 
-#if $adhesion or $extraAmount != 0
-<div class="main aux">
-<h2>Adhésion</h2>
-<div class="content">
-<table class='order'>
-#if $adhesion
-<tr>
-<td width="30%"><b>Montant de l'adhésion</b></td>
-<td>$adhesion.displayAmount €
-#if $adhesion.paperwork_verified is None
-<span class="negative">En attente de règlement</span>
-#end if
-</td>
-</tr>
-#if $extraAmount != 0
-<tr>
-<td width="30%"><b>Paiements complémentaires</b></td>
-<td>$displayExtraAmount €
-</td>
-</tr>
-#end if
-<tr>
-<td width="30%"><b>Montant de la commande</b></td>
-<td>$adhesion.displayOrderAmount €</td>
-</tr>
-#end if
-<tr>
-<td width="30%"><b>Solde</b></td>
-<td>
-#if $adhesion
-#if $adhesion.balance >= 0
-$adhesion.displayBalance €
-#else
-<span class="negative">$adhesion.displayBalance €</span>
-#end if
-#else
-#if $extraAmount >= 0
-$displayExtraAmount €
-#else
-<span class="negative">$displayExtraAmount €</span>
-#end if
-#end if
-</td>
-</tr>
-</table>
-</div>
-</div>
+#if $wallet
+$walletDetails
 #end if
 
 <div class="main aux">
