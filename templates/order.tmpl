@@ -16,6 +16,10 @@ $success
 </div>
 #end if
 
+#if $wallet
+$walletDetails
+#end if
+
 <form method="POST">
   #for $bake in $bakes
   #import datetime
