@@ -249,7 +249,10 @@ class App(db.DBManager, pdfwriter.ContractGenerator):
             self.conn = opendb()
 
             # FIXME choose contract with newadhesion = True
-            openContract = 8
+            try:
+                openContract = int(params.getfirst('c'))
+            except:
+                openContract = 10
             template.contract = self.getContract(openContract)
             template.futureBakes = list(self.getFutureBakes(openContract))
             if len(template.futureBakes) == 0:
