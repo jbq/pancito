@@ -41,6 +41,8 @@ for option, value in options:
         conditions.append("place_id = %s" % int(value))
 
 if noOrder:
+    if len(bakeIds) == 0:
+        raise Exception("Expecting bake ids for no-order option")
     conditions.append("id NOT IN (select userid from bakeorder where bakeid IN (%s))" % ", ".join(bakeIds))
 
 if len(conditions) == 0:
